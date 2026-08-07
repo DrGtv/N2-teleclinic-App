@@ -60,7 +60,7 @@ def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# 3. Clean CSS Styling
+# 3. Creative Option B Styling - Royal Gold Doctor Profiles
 st.markdown("""
 <style>
     .stApp {
@@ -115,16 +115,66 @@ st.markdown("""
         margin-top: 12px;
         box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35);
     }
-    
-    .doc-box {
-        background: #ffffff !important;
-        border: 1px solid #dda15e;
-        border-radius: 14px;
-        padding: 16px;
+
+    /* 🌟 OPTION B: Creative Royal Gold Doctor Card 🌟 */
+    .option-b-card {
+        background: linear-gradient(135deg, #ffffff 0%, #fefae0 100%) !important;
+        border: 2px solid #dda15e !important;
+        border-radius: 20px !important;
+        padding: 20px !important;
+        box-shadow: 0 10px 25px rgba(188, 108, 37, 0.12) !important;
         text-align: center;
-        box-shadow: 0 4px 12px rgba(188, 108, 37, 0.06);
+        position: relative;
     }
-    
+
+    .option-b-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #283618 0%, #dda15e 50%, #bc6c25 100%);
+        border-radius: 20px 20px 0 0;
+    }
+
+    .photo-frame-gold {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid #dda15e;
+        padding: 3px;
+        background: #ffffff;
+        box-shadow: 0 6px 15px rgba(188, 108, 37, 0.2);
+        margin: 0 auto 10px auto;
+        object-fit: cover;
+    }
+
+    .doc-name-b {
+        color: #0b3c5d !important;
+        font-size: 20px !important;
+        font-weight: 800 !important;
+        margin: 6px 0 2px 0 !important;
+    }
+
+    .doc-qual-b {
+        color: #283618 !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        margin: 0 0 10px 0 !important;
+    }
+
+    .doc-badge-gold {
+        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        color: #0284c7 !important;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 800;
+        display: inline-block;
+        border: 1px solid #0284c7;
+    }
+
     .inst-card {
         border-left: 5px solid #283618;
         background: #ffffff !important;
@@ -165,45 +215,49 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Hero Section: Replaced bland text block with New Attractively Rendered Banner Image
+# Main Hero Banner Logo
 hero_banner_files = ["hero_banner.png", "hero_banner.jpg", "116795.png"]
-banner_found = False
 for b in hero_banner_files:
     if os.path.exists(b):
         st.image(b, use_container_width=True)
-        banner_found = True
         break
-
-if not banner_found:
-    # Fallback to Top Hospital Logo if Hero Banner is missing
-    col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
-    with col_l2:
-        if os.path.exists("logo.jpg"):
-            st.image("logo.jpg", use_container_width=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Verified Doctors Section
+# 🌟 OPTION B: Creative Doctor Profiles 🌟
 doc_col1, doc_col2 = st.columns(2)
+
 with doc_col1:
+    st.markdown('<div class="option-b-card">', unsafe_allow_html=True)
+    if os.path.exists("doc_vigneshwar.png"):
+        st.image("doc_vigneshwar.png", width=100)
+    elif os.path.exists("doc_vigneshwar.jpg"):
+        st.image("doc_vigneshwar.jpg", width=100)
+    else:
+        st.markdown('<div style="font-size: 54px; margin-bottom: 5px;">👨‍⚕️</div>', unsafe_allow_html=True)
+        
     st.markdown("""
-        <div class="doc-box">
-            <div style="font-size: 30px; margin-bottom: 5px;">👨‍⚕️</div>
-            <b style="color: #0b3c5d !important; font-size: 17px;">Dr. Vigneshwar</b><br>
-            <span style="font-size: 13px; color: #475569;">MBBS, MD General Medicine</span><br>
-            <small style="color: #0284c7; font-weight: bold;">✓ TNMC Reg No: 159693</small>
-        </div>
+        <p class="doc-name-b">Dr. Vigneshwar</p>
+        <p class="doc-qual-b">MBBS, MD General Medicine</p>
+        <div class="doc-badge-gold">✓ TNMC Reg No: 159693</div>
     """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with doc_col2:
+    st.markdown('<div class="option-b-card">', unsafe_allow_html=True)
+    if os.path.exists("doc_malathi.png"):
+        st.image("doc_malathi.png", width=100)
+    elif os.path.exists("doc_malathi.jpg"):
+        st.image("doc_malathi.jpg", width=100)
+    else:
+        st.markdown('<div style="font-size: 54px; margin-bottom: 5px;">👩‍⚕️</div>', unsafe_allow_html=True)
+        
     st.markdown("""
-        <div class="doc-box">
-            <div style="font-size: 30px; margin-bottom: 5px;">👩‍⚕️</div>
-            <b style="color: #0b3c5d !important; font-size: 17px;">Dr. S. Malathi</b><br>
-            <span style="font-size: 13px; color: #475569;">MBBS, MD General Medicine</span><br>
-            <small style="color: #0284c7; font-weight: bold;">✓ TNMC Verified Practitioner</small>
-        </div>
+        <p class="doc-name-b">Dr. S. Malathi</p>
+        <p class="doc-qual-b">MBBS, MD General Medicine</p>
+        <div class="doc-badge-gold">✓ TNMC Verified Practitioner</div>
     """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -367,7 +421,7 @@ with tab1:
 
     st.markdown("---")
     
-    # UPI Payment Section
+    # UPI Payment
     st.subheader("💳 Instant ₹100 Payment Portal")
     pay_col1, pay_col2 = st.columns([1, 2])
     
