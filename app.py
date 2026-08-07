@@ -4,10 +4,11 @@ import pandas as pd
 from datetime import datetime
 import urllib.parse
 import os
+import base64
 
 # 1. Page Configuration
 st.set_page_config(
-    page_title="N2 Care Teleclinic | Picturesque Second Opinion Portal",
+    page_title="N2 Care Teleclinic | Watermark Background Portal",
     page_icon="🩺",
     layout="wide"
 )
@@ -60,88 +61,81 @@ def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# 3. Premium Picturesque CSS Theme
-st.markdown("""
-<style>
-    /* Gradient Background */
-    .stApp {
-        background: linear-gradient(180deg, #f0fdf4 0%, #e0f2fe 350px, #f8fafc 100%) !important;
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    }
-    
-    /* Hero Banner Styling */
-    .hero-card {
-        background: linear-gradient(135deg, #0f172a 0%, #0b3c5d 60%, #0284c7 100%);
-        padding: 35px 25px;
-        border-radius: 20px;
-        color: white;
-        text-align: center;
-        box-shadow: 0 20px 35px rgba(11, 60, 93, 0.25);
-        margin-bottom: 25px;
-    }
-    
-    /* Glassmorphism Card Style */
-    .glass-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(226, 232, 240, 0.8);
-        padding: 24px;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        height: 100%;
-    }
-    .glass-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 15px 30px rgba(2, 132, 199, 0.12);
-    }
-    
-    /* WhatsApp Picturesque Button */
-    .btn-wa {
-        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-        color: white !important;
-        padding: 12px 24px;
-        font-weight: 700;
-        text-decoration: none;
-        border-radius: 10px;
-        display: inline-block;
-        margin-top: 12px;
-        box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35);
-        letter-spacing: 0.3px;
-    }
-    
-    /* Badge Styles */
-    .badge-pill {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(5px);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        padding: 10px 18px;
-        border-radius: 12px;
-        display: inline-block;
-        margin: 5px;
-    }
-    
-    .inst-card {
-        border-left: 5px solid #0284c7;
-        background: #ffffff;
-        padding: 14px 18px;
-        margin-bottom: 12px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    }
-</style>
-""", unsafe_allow_html=True)
+# Base64 Image Background Watermark Encoder
+def set_background_watermark():
+    bg_files = ["logo.jpg", "logo.png", "logo.jpeg", "116755.jpg", "116741.jpg"]
+    encoded_str = ""
+    for file in bg_files:
+        if os.path.exists(file):
+            with open(file, "rb") as f:
+                encoded_str = base64.b64encode(f.read()).decode()
+            break
+            
+    if encoded_str:
+        st.markdown(f"""
+        <style>
+            .stApp {{
+                background-image: linear-gradient(rgba(240, 249, 255, 0.88), rgba(255, 255, 255, 0.92)), url("data:image/jpg;base64,{encoded_str}") !important;
+                background-size: cover !important;
+                background-position: center !important;
+                background-repeat: no-repeat !important;
+                background-attachment: fixed !important;
+            }}
+            .glass-card {{
+                background: rgba(255, 255, 255, 0.92) !important;
+                backdrop-filter: blur(8px);
+                border: 1px solid rgba(226, 232, 240, 0.9);
+                padding: 24px;
+                border-radius: 16px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            }}
+            .hero-card {{
+                background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(11, 60, 93, 0.92) 60%, rgba(2, 132, 199, 0.9) 100%);
+                padding: 35px 25px;
+                border-radius: 20px;
+                color: white;
+                text-align: center;
+                box-shadow: 0 20px 35px rgba(11, 60, 93, 0.2);
+                margin-bottom: 25px;
+            }}
+            .btn-wa {{
+                background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+                color: white !important;
+                padding: 12px 24px;
+                font-weight: 700;
+                text-decoration: none;
+                border-radius: 10px;
+                display: inline-block;
+                margin-top: 12px;
+                box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35);
+            }}
+            .badge-pill {{
+                background: rgba(255, 255, 255, 0.18);
+                backdrop-filter: blur(5px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                padding: 10px 18px;
+                border-radius: 12px;
+                display: inline-block;
+                margin: 5px;
+            }}
+            .inst-card {{
+                border-left: 5px solid #0284c7;
+                background: rgba(255, 255, 255, 0.95);
+                padding: 14px 18px;
+                margin-bottom: 12px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            }}
+        </style>
+        """, unsafe_allow_html=True)
 
-# 4. Hero Section with Logo
+set_background_watermark()
+
+# 3. Hero Header
 col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
 with col_l2:
-    logo_files = ["logo.jpg", "logo.png", "logo.jpeg", "Logo.png"]
-    logo_found = False
-    for f in logo_files:
-        if os.path.exists(f):
-            st.image(f, use_container_width=True)
-            logo_found = True
-            break
+    if os.path.exists("logo.jpg"):
+        st.image("logo.jpg", use_container_width=True)
 
 st.markdown("""
     <div class="hero-card">
@@ -169,7 +163,7 @@ p_col3.success(f"🩺 MD Doctor Review: {REVIEW_HOURS}")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 5. Application Navigation Tabs
+# 4. Application Navigation Tabs
 tab1, tab2, tab3, tab4 = st.tabs([
     "🤝 Patient Portal & Booking",
     "🌐 National Directory & Referral Hub",
@@ -183,17 +177,17 @@ with tab1:
         <div class="glass-card" style="margin-bottom: 25px; text-align: center;">
             <h3 style="color: #0b3c5d; margin-top: 0; font-weight: 700;">✨ How Your Online Second Opinion Works</h3>
             <div style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: center; margin-top: 20px; gap: 15px;">
-                <div style="flex: 1; min-width: 220px; background: #f8fafc; padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <div style="flex: 1; min-width: 220px; background: rgba(248, 250, 252, 0.9); padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0;">
                     <div style="font-size: 32px;">1️⃣</div>
                     <b style="color: #0f172a; font-size: 16px;">Send Reports</b>
                     <p style="font-size: 13px; color: #64748b; margin-top: 6px;">Share blood tests, CT/MRI links, or voice notes on WhatsApp between 9 AM - 3 PM.</p>
                 </div>
-                <div style="flex: 1; min-width: 220px; background: #f8fafc; padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <div style="flex: 1; min-width: 220px; background: rgba(248, 250, 252, 0.9); padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0;">
                     <div style="font-size: 32px;">2️⃣</div>
                     <b style="color: #0f172a; font-size: 16px;">Specialist Review</b>
                     <p style="font-size: 13px; color: #64748b; margin-top: 6px;">MD General Medicine specialists analyze your clinical history daily from 4 PM - 6 PM.</p>
                 </div>
-                <div style="flex: 1; min-width: 220px; background: #f8fafc; padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <div style="flex: 1; min-width: 220px; background: rgba(248, 250, 252, 0.9); padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0;">
                     <div style="font-size: 32px;">3️⃣</div>
                     <b style="color: #0f172a; font-size: 16px;">Receive Guidance</b>
                     <p style="font-size: 13px; color: #64748b; margin-top: 6px;">Get clear diagnosis validation, drug safety checks, or diet advice directly on WhatsApp.</p>
@@ -445,7 +439,7 @@ with tab3:
     elif pin_input_1:
         st.error("Incorrect Passcode.")
 
-# TAB 4: Searchable Database & Rx
+# TAB 4: Searchable Database & Rx Pad
 with tab4:
     st.subheader("🔒 Doctor Internal Portal")
     pin_input_2 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin2")
