@@ -12,7 +12,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Configuration Variables
+# Configuration Settings
 CLINIC_PHONE = "919486872627"
 UPI_ID = "9486872627@upi"
 CONSULTATION_FEE = "₹100"
@@ -60,7 +60,7 @@ def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# 3. Clean CSS Button & Card Styles
+# 3. Clean CSS Styles
 st.markdown("""
 <style>
     .service-card {
@@ -92,22 +92,21 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 4. Header & Branding Section (Native Layout)
-logo_files = ["logo.png", "logo.jpg", "logo.jpeg", "Logo.png", "116741.jpg", "116741_2.jpg", "116742.jpg", "116743.jpg", "116744.jpg"]
-logo_found = False
-
+# 4. Native Header UI with Direct logo.jpg Detection
 col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
 with col_l2:
+    logo_files = ["logo.jpg", "logo.png", "logo.jpeg", "Logo.png"]
+    logo_found = False
     for f in logo_files:
         if os.path.exists(f):
-            st.image(f, use_column_width=True)
+            st.image(f, use_container_width=True)
             logo_found = True
             break
     if not logo_found:
         st.markdown("<h1 style='text-align: center; color: #0b3c5d;'>🏥 N2 CARE TELECLINIC</h1>", unsafe_allow_html=True)
 
 st.markdown("""
-    <div style="text-align: center; margin-top: -10px; margin-bottom: 20px;">
+    <div style="text-align: center; margin-top: -10px; margin-bottom: 15px;">
         <h2 style="color: #0b3c5d; margin-bottom: 2px;">N2 CARE TELECLINIC</h2>
         <p style="font-size: 18px; font-style: italic; color: #0284c7; font-weight: 600; margin-top: 0;">"Your Friendly Second Opinion"</p>
         <p style="font-size: 14px; color: #475569; margin-top: -8px;">One Care. Many Specialties. One Purpose.</p>
@@ -136,7 +135,7 @@ with d_col2:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Operational Status Pills
+# Operational Status Banner
 p_col1, p_col2, p_col3 = st.columns(3)
 p_col1.error(f"Fee: {CONSULTATION_FEE} Only")
 p_col2.info(f"📩 Report Submission: {BOOKING_HOURS}")
