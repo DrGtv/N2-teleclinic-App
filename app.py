@@ -3,6 +3,8 @@ import sqlite3
 import pandas as pd
 from datetime import datetime
 import urllib.parse
+import os
+import base64
 
 # 1. Page Configuration
 st.set_page_config(
@@ -10,6 +12,21 @@ st.set_page_config(
     page_icon="🩺",
     layout="wide"
 )
+
+# Robust Logo Auto-Detection & Base64 Encoder
+def get_logo_base64():
+    possible_files = ["logo.png", "logo.jpg", "logo.jpeg", "Logo.png", "LOGO.PNG"]
+    for file in possible_files:
+        if os.path.exists(file):
+            with open(file, "rb") as f:
+                encoded = base64.b64encode(f.read()).decode()
+                ext = file.split(".")[-1].lower()
+                if ext == "jpg":
+                    ext = "jpeg"
+                return f"data:image/{ext};base64,{encoded}"
+    return "https://raw.githubusercontent.com/DrGtv/N2-teleclinic-App/main/logo.png"
+
+logo_src = get_logo_base64()
 
 # Configuration & Clinic Settings
 CLINIC_PHONE = "919486872627"
@@ -56,12 +73,12 @@ def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# 3. Modern Medical Header with N2 CARE Logo & TNMC Badges
+# 3. Clinic Header Styling & Layout
 st.markdown(f"""
     <style>
         .header-card {{
             background: linear-gradient(135deg, #0b3c5d 0%, #1d5b84 100%);
-            padding: 30px;
+            padding: 25px;
             border-radius: 16px;
             color: white;
             text-align: center;
@@ -79,13 +96,13 @@ st.markdown(f"""
             font-size: 18px;
             font-style: italic;
             color: #38bdf8;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             font-weight: 600;
         }}
         .doc-badge {{
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-            padding: 12px 22px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(6px);
+            padding: 12px 20px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             display: inline-block;
@@ -95,9 +112,9 @@ st.markdown(f"""
         .tnmc-verified {{
             background-color: #0284c7;
             color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 11px;
             font-weight: bold;
             display: inline-block;
             margin-top: 4px;
@@ -135,14 +152,13 @@ st.markdown(f"""
 
     <div class="header-card">
         <div>
-            <!-- GitHub Raw N2 Care Logo Image -->
-            <img src="https://raw.githubusercontent.com/DrGtv/N2-teleclinic-App/main/logo.png" 
+            <img src="{logo_src}" 
                  onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3063/3063176.png';" 
-                 style="height: 110px; width: auto; background: white; padding: 10px; border-radius: 12px; box-shadow: 0px 4px 12px rgba(0,0,0,0.2);">
+                 style="max-height: 120px; max-width: 90%; width: auto; background: #ffffff; padding: 10px 18px; border-radius: 14px; box-shadow: 0px 4px 15px rgba(0,0,0,0.25);">
         </div>
         <div class="clinic-title">N2 CARE TELECLINIC</div>
         <div class="clinic-tagline">"Your Friendly Second Opinion"</div>
-        <p style="font-size: 14px; color: #e0f2fe; margin-top: -8px;">One Care. Many Specialties. One Purpose.</p>
+        <p style="font-size: 14px; color: #e0f2fe; margin-top: -6px;">One Care. Many Specialties. One Purpose.</p>
         
         <div style="margin-top: 15px;">
             <div class="doc-badge">
@@ -431,4 +447,4 @@ with tab3:
         else:
             st.info("No patient records registered yet.")
     elif pin_input_2:
-        st.error("Incorrect Passcode.")
+        st.error("Incorrect Passcode.")                                 
