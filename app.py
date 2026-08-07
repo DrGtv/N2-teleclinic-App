@@ -60,7 +60,7 @@ def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# 3. Creative Option B Styling - Royal Gold Doctor Profiles
+# 3. Custom Glassmorphic CSS for AI Doctor Avatars
 st.markdown("""
 <style>
     .stApp {
@@ -116,63 +116,50 @@ st.markdown("""
         box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35);
     }
 
-    /* 🌟 OPTION B: Creative Royal Gold Doctor Card 🌟 */
-    .option-b-card {
+    /* 🌟 AI Avatar Custom Card Styling 🌟 */
+    .avatar-card-container {
         background: linear-gradient(135deg, #ffffff 0%, #fefae0 100%) !important;
         border: 2px solid #dda15e !important;
         border-radius: 20px !important;
-        padding: 20px !important;
+        padding: 18px 22px !important;
         box-shadow: 0 10px 25px rgba(188, 108, 37, 0.12) !important;
-        text-align: center;
         position: relative;
+        overflow: hidden;
     }
 
-    .option-b-card::before {
+    .avatar-card-container::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
-        height: 6px;
-        background: linear-gradient(90deg, #283618 0%, #dda15e 50%, #bc6c25 100%);
-        border-radius: 20px 20px 0 0;
+        height: 5px;
+        background: linear-gradient(90deg, #0b3c5d 0%, #dda15e 50%, #0284c7 100%);
     }
 
-    .photo-frame-gold {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        border: 3px solid #dda15e;
-        padding: 3px;
-        background: #ffffff;
-        box-shadow: 0 6px 15px rgba(188, 108, 37, 0.2);
-        margin: 0 auto 10px auto;
-        object-fit: cover;
-    }
-
-    .doc-name-b {
+    .doc-name-avatar {
         color: #0b3c5d !important;
-        font-size: 20px !important;
+        font-size: 19px !important;
         font-weight: 800 !important;
-        margin: 6px 0 2px 0 !important;
+        margin: 0 0 2px 0 !important;
     }
 
-    .doc-qual-b {
-        color: #283618 !important;
+    .doc-qual-avatar {
+        color: #475569 !important;
         font-size: 13px !important;
-        font-weight: 700 !important;
-        margin: 0 0 10px 0 !important;
+        font-weight: 600 !important;
+        margin: 0 0 8px 0 !important;
     }
 
-    .doc-badge-gold {
-        background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+    .doc-badge-pill {
+        background: #e0f2fe;
         color: #0284c7 !important;
-        padding: 6px 16px;
+        padding: 5px 12px;
         border-radius: 20px;
         font-size: 12px;
         font-weight: 800;
         display: inline-block;
-        border: 1px solid #0284c7;
+        border: 1px solid #bae6fd;
     }
 
     .inst-card {
@@ -224,39 +211,47 @@ for b in hero_banner_files:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 🌟 OPTION B: Creative Doctor Profiles 🌟
+# 🌟 AI Avatar Doctor Board Section 🌟
 doc_col1, doc_col2 = st.columns(2)
 
 with doc_col1:
-    st.markdown('<div class="option-b-card">', unsafe_allow_html=True)
-    if os.path.exists("doc_vigneshwar.png"):
-        st.image("doc_vigneshwar.png", width=100)
-    elif os.path.exists("doc_vigneshwar.jpg"):
-        st.image("doc_vigneshwar.jpg", width=100)
-    else:
-        st.markdown('<div style="font-size: 54px; margin-bottom: 5px;">👨‍⚕️</div>', unsafe_allow_html=True)
-        
-    st.markdown("""
-        <p class="doc-name-b">Dr. Vigneshwar</p>
-        <p class="doc-qual-b">MBBS, MD General Medicine</p>
-        <div class="doc-badge-gold">✓ TNMC Reg No: 159693</div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="avatar-card-container">', unsafe_allow_html=True)
+    c1, c2 = st.columns([1, 2.3])
+    with c1:
+        if os.path.exists("doc_vigneshwar.png"):
+            st.image("doc_vigneshwar.png", width=95)
+        elif os.path.exists("doc_vigneshwar.jpg"):
+            st.image("doc_vigneshwar.jpg", width=95)
+        else:
+            st.markdown('<div style="font-size: 52px; text-align: center; line-height: 1;">👨‍⚕️</div>', unsafe_allow_html=True)
+    with c2:
+        st.markdown("""
+            <div>
+                <p class="doc-name-avatar">Dr. Vigneshwar</p>
+                <p class="doc-qual-avatar">MBBS, MD General Medicine</p>
+                <div class="doc-badge-pill">✓ TNMC Reg No: 159693</div>
+            </div>
+        """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 with doc_col2:
-    st.markdown('<div class="option-b-card">', unsafe_allow_html=True)
-    if os.path.exists("doc_malathi.png"):
-        st.image("doc_malathi.png", width=100)
-    elif os.path.exists("doc_malathi.jpg"):
-        st.image("doc_malathi.jpg", width=100)
-    else:
-        st.markdown('<div style="font-size: 54px; margin-bottom: 5px;">👩‍⚕️</div>', unsafe_allow_html=True)
-        
-    st.markdown("""
-        <p class="doc-name-b">Dr. S. Malathi</p>
-        <p class="doc-qual-b">MBBS, MD General Medicine</p>
-        <div class="doc-badge-gold">✓ TNMC Verified Practitioner</div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="avatar-card-container">', unsafe_allow_html=True)
+    c1, c2 = st.columns([1, 2.3])
+    with c1:
+        if os.path.exists("doc_malathi.png"):
+            st.image("doc_malathi.png", width=95)
+        elif os.path.exists("doc_malathi.jpg"):
+            st.image("doc_malathi.jpg", width=95)
+        else:
+            st.markdown('<div style="font-size: 52px; text-align: center; line-height: 1;">👩‍⚕️</div>', unsafe_allow_html=True)
+    with c2:
+        st.markdown("""
+            <div>
+                <p class="doc-name-avatar">Dr. S. Malathi</p>
+                <p class="doc-qual-avatar">MBBS, MD General Medicine</p>
+                <div class="doc-badge-pill">✓ TNMC Verified Practitioner</div>
+            </div>
+        """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
