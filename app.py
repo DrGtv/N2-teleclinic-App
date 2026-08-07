@@ -4,11 +4,10 @@ import pandas as pd
 from datetime import datetime
 import urllib.parse
 import os
-import base64
 
 # 1. Page Configuration
 st.set_page_config(
-    page_title="N2 Care Teleclinic | High-Contrast Second Opinion Portal",
+    page_title="N2 Care Teleclinic | Official Teleconsultation Portal",
     page_icon="🩺",
     layout="wide"
 )
@@ -61,117 +60,97 @@ def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# Full HD Hospital Background Encoder with High-Visibility Overlay
-def set_full_hospital_background():
-    bg_files = ["logo.jpg", "logo.png", "logo.jpeg", "116755.jpg", "116741.jpg", "116761.jpg"]
-    encoded_str = ""
-    for file in bg_files:
-        if os.path.exists(file):
-            with open(file, "rb") as f:
-                encoded_str = base64.b64encode(f.read()).decode()
-            break
-            
-    if encoded_str:
-        st.markdown(f"""
-        <style>
-            /* Light Overlay to make text and cards 100% visible while preserving hospital backdrop */
-            .stApp {{
-                background-image: linear-gradient(rgba(240, 249, 255, 0.82), rgba(248, 250, 252, 0.88)), url("data:image/jpg;base64,{encoded_str}") !important;
-                background-size: cover !important;
-                background-position: center !important;
-                background-repeat: no-repeat !important;
-                background-attachment: fixed !important;
-            }}
-            
-            /* High-Contrast Glass Cards for Sharp Text Readability */
-            .glass-card {{
-                background: rgba(255, 255, 255, 0.94) !important;
-                backdrop-filter: blur(12px);
-                border: 1px solid rgba(2, 132, 199, 0.2);
-                padding: 22px;
-                border-radius: 16px;
-                box-shadow: 0 10px 30px rgba(11, 60, 93, 0.08);
-                height: 100%;
-            }}
-            
-            /* Bold Navy Blue Hero Banner */
-            .hero-card {{
-                background: linear-gradient(135deg, #0b3c5d 0%, #0284c7 100%) !important;
-                padding: 30px 20px;
-                border-radius: 20px;
-                color: #ffffff !important;
-                text-align: center;
-                box-shadow: 0 15px 35px rgba(11, 60, 93, 0.25);
-                margin-bottom: 20px;
-            }}
-            
-            .btn-wa {{
-                background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-                color: white !important;
-                padding: 12px 24px;
-                font-weight: 700;
-                text-decoration: none;
-                border-radius: 10px;
-                display: inline-block;
-                margin-top: 12px;
-                box-shadow: 0 6px 15px rgba(37, 211, 102, 0.4);
-            }}
+# 3. Clean & Professional CSS Styling
+st.markdown("""
+<style>
+    /* Full App Soft Background */
+    .stApp {
+        background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 400px, #f8fafc 100%) !important;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    /* Clean Service Card */
+    .glass-card {
+        background: #ffffff !important;
+        border: 1px solid #bae6fd;
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08);
+        height: 100%;
+    }
+    
+    /* Executive Blue Hero Card */
+    .hero-card {
+        background: linear-gradient(135deg, #0b3c5d 0%, #0284c7 100%) !important;
+        padding: 30px 20px;
+        border-radius: 20px;
+        color: #ffffff !important;
+        text-align: center;
+        box-shadow: 0 15px 35px rgba(11, 60, 93, 0.2);
+        margin-bottom: 20px;
+    }
+    
+    .btn-wa {
+        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        color: white !important;
+        padding: 12px 24px;
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 10px;
+        display: inline-block;
+        margin-top: 12px;
+        box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35);
+    }
 
-            .btn-emergency {{
-                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                color: white !important;
-                padding: 10px 20px;
-                font-weight: 700;
-                text-decoration: none;
-                border-radius: 8px;
-                display: inline-block;
-                box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-            }}
-            
-            .badge-pill {{
-                background: rgba(255, 255, 255, 0.22);
-                backdrop-filter: blur(5px);
-                border: 1px solid rgba(255, 255, 255, 0.35);
-                padding: 10px 18px;
-                border-radius: 12px;
-                display: inline-block;
-                margin: 5px;
-            }}
-            
-            .inst-card {{
-                border-left: 5px solid #0284c7;
-                background: rgba(255, 255, 255, 0.95) !important;
-                backdrop-filter: blur(8px);
-                padding: 14px 18px;
-                margin-bottom: 12px;
-                border-radius: 10px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            }}
+    .btn-emergency {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white !important;
+        padding: 10px 20px;
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 8px;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    
+    .badge-pill {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        padding: 10px 18px;
+        border-radius: 12px;
+        display: inline-block;
+        margin: 5px;
+    }
+    
+    .inst-card {
+        border-left: 5px solid #0284c7;
+        background: #ffffff !important;
+        padding: 14px 18px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
 
-            .testimonial-box {{
-                background: rgba(255, 255, 255, 0.95);
-                border-left: 4px solid #0284c7;
-                padding: 15px;
-                border-radius: 8px;
-                margin-bottom: 10px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-            }}
+    .testimonial-box {
+        background: #ffffff;
+        border-left: 4px solid #0284c7;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
 
-            /* Crisp Dark Colors for Headings and Body Text */
-            h1, h2, h3, h4 {{
-                color: #0b3c5d !important;
-                font-weight: 800 !important;
-            }}
-            p, span, li, label {{
-                color: #1e293b !important;
-                font-weight: 500;
-            }}
-        </style>
-        """, unsafe_allow_html=True)
+    h1, h2, h3, h4 {
+        color: #0b3c5d !important;
+        font-weight: 800 !important;
+    }
+    p, span, li, label {
+        color: #1e293b !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-set_full_hospital_background()
-
-# Top Emergency Header Bar
+# Top Urgent Helpline Bar
 st.markdown(f"""
     <div style="display: flex; justify-content: space-between; align-items: center; background: #0b3c5d; padding: 12px 20px; border-radius: 12px; margin-bottom: 15px; color: white;">
         <span style="color: white !important;">🚨 <b>Urgent Clinical Helpline:</b> +91 94868 72627</span>
@@ -179,7 +158,18 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# 3. Hero Header
+# 4. Top Prominent Logo Render
+col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
+with col_l2:
+    logo_files = ["logo.jpg", "logo.png", "logo.jpeg", "Logo.png"]
+    logo_found = False
+    for f in logo_files:
+        if os.path.exists(f):
+            st.image(f, use_container_width=True)
+            logo_found = True
+            break
+
+# Hero Header
 st.markdown("""
     <div class="hero-card">
         <h1 style="color: #ffffff !important; margin-bottom: 4px; font-size: 34px; font-weight: 800; letter-spacing: 1px;">N2 CARE TELECLINIC</h1>
@@ -206,10 +196,10 @@ p_col3.success(f"🩺 MD Doctor Review: {REVIEW_HOURS}")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 4. Application Navigation Tabs
+# Navigation Tabs
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🤝 Patient Portal & Booking",
-    "🩺 Second Opinion Screening Bundles",
+    "🩺 Specialty Second Opinion Packages",
     "🌐 Regional & National Directory",
     "🔒 Doctor Dashboard",
     "🔒 Database & E-Prescription"
@@ -221,17 +211,17 @@ with tab1:
         <div class="glass-card" style="margin-bottom: 25px; text-align: center;">
             <h3 style="color: #0b3c5d !important; margin-top: 0; font-weight: 800;">✨ How Your Online Second Opinion Works</h3>
             <div style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: center; margin-top: 20px; gap: 15px;">
-                <div style="flex: 1; min-width: 220px; background: rgba(240, 249, 255, 0.9); padding: 18px; border-radius: 12px; border: 1px solid #bae6fd;">
+                <div style="flex: 1; min-width: 220px; background: #f0f9ff; padding: 18px; border-radius: 12px; border: 1px solid #bae6fd;">
                     <div style="font-size: 32px;">1️⃣</div>
                     <b style="color: #0b3c5d !important; font-size: 16px;">Send Reports</b>
                     <p style="font-size: 13px; color: #334155 !important; margin-top: 6px;">Share blood tests, CT/MRI links, or voice notes on WhatsApp between 9 AM - 3 PM.</p>
                 </div>
-                <div style="flex: 1; min-width: 220px; background: rgba(240, 249, 255, 0.9); padding: 18px; border-radius: 12px; border: 1px solid #bae6fd;">
+                <div style="flex: 1; min-width: 220px; background: #f0f9ff; padding: 18px; border-radius: 12px; border: 1px solid #bae6fd;">
                     <div style="font-size: 32px;">2️⃣</div>
                     <b style="color: #0b3c5d !important; font-size: 16px;">Specialist Review</b>
                     <p style="font-size: 13px; color: #334155 !important; margin-top: 6px;">MD General Medicine specialists analyze your clinical history daily from 4 PM - 6 PM.</p>
                 </div>
-                <div style="flex: 1; min-width: 220px; background: rgba(240, 249, 255, 0.9); padding: 18px; border-radius: 12px; border: 1px solid #bae6fd;">
+                <div style="flex: 1; min-width: 220px; background: #f0f9ff; padding: 18px; border-radius: 12px; border: 1px solid #bae6fd;">
                     <div style="font-size: 32px;">3️⃣</div>
                     <b style="color: #0b3c5d !important; font-size: 16px;">Receive Guidance</b>
                     <p style="font-size: 13px; color: #334155 !important; margin-top: 6px;">Get clear diagnosis validation, drug safety checks, or diet advice directly on WhatsApp.</p>
@@ -240,7 +230,7 @@ with tab1:
         </div>
     """, unsafe_allow_html=True)
 
-    # Interactive Form
+    # Interactive Quick Form
     st.subheader("📋 Direct Consultation Request Builder")
     col_q1, col_q2 = st.columns(2)
     with col_q1:
@@ -377,7 +367,7 @@ with tab1:
             </div>
         """, unsafe_allow_html=True)
 
-# TAB 2: Specialty Second Opinion Bundles
+# TAB 2: Specialty Health Screening Bundles
 with tab2:
     st.subheader("🩺 Specialty Second Opinion Packages")
     st.write("Structured report evaluation packages designed for specific health concerns:")
