@@ -60,33 +60,62 @@ def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# 3. Clean & Professional CSS Styling
+# 3. Clean CSS Styling with High Contrast
 st.markdown("""
 <style>
-    /* Full App Soft Background */
+    /* Full App Background Gradient */
     .stApp {
-        background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 400px, #f8fafc 100%) !important;
+        background: linear-gradient(180deg, #e0f2fe 0%, #ffffff 350px, #f8fafc 100%) !important;
         font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* Clean Service Card */
+    /* Top Emergency Header Bar Fix */
+    .emergency-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #ffffff;
+        border: 2px solid #ef4444;
+        padding: 10px 18px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+    }
+    
+    .emergency-text {
+        color: #991b1b !important;
+        font-weight: 800 !important;
+        font-size: 15px;
+    }
+    
+    .btn-emergency {
+        background: #ef4444;
+        color: white !important;
+        padding: 8px 16px;
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Glass Cards */
     .glass-card {
         background: #ffffff !important;
         border: 1px solid #bae6fd;
-        padding: 24px;
+        padding: 22px;
         border-radius: 16px;
         box-shadow: 0 8px 24px rgba(2, 132, 199, 0.08);
         height: 100%;
     }
     
-    /* Executive Blue Hero Card */
+    /* Sleek Hero Banner */
     .hero-card {
         background: linear-gradient(135deg, #0b3c5d 0%, #0284c7 100%) !important;
-        padding: 30px 20px;
-        border-radius: 20px;
+        padding: 25px 20px;
+        border-radius: 18px;
         color: #ffffff !important;
         text-align: center;
-        box-shadow: 0 15px 35px rgba(11, 60, 93, 0.2);
+        box-shadow: 0 12px 30px rgba(11, 60, 93, 0.2);
         margin-bottom: 20px;
     }
     
@@ -101,21 +130,10 @@ st.markdown("""
         margin-top: 12px;
         box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35);
     }
-
-    .btn-emergency {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-        color: white !important;
-        padding: 10px 20px;
-        font-weight: 700;
-        text-decoration: none;
-        border-radius: 8px;
-        display: inline-block;
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-    }
     
     .badge-pill {
         background: rgba(255, 255, 255, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.4);
         padding: 10px 18px;
         border-radius: 12px;
         display: inline-block;
@@ -150,32 +168,26 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Top Urgent Helpline Bar
+# Top Urgent Helpline Bar (Fixed Contrast Issue)
 st.markdown(f"""
-    <div style="display: flex; justify-content: space-between; align-items: center; background: #0b3c5d; padding: 12px 20px; border-radius: 12px; margin-bottom: 15px; color: white;">
-        <span style="color: white !important;">🚨 <b>Urgent Clinical Helpline:</b> +91 94868 72627</span>
+    <div class="emergency-bar">
+        <span class="emergency-text">🚨 Urgent Clinical Helpline: +91 94868 72627</span>
         <a href="tel:919486872627" class="btn-emergency">📞 Call Clinic Now</a>
     </div>
 """, unsafe_allow_html=True)
 
-# 4. Top Prominent Logo Render
+# Header Section with Logo
 col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
 with col_l2:
-    logo_files = ["logo.jpg", "logo.png", "logo.jpeg", "Logo.png"]
-    logo_found = False
-    for f in logo_files:
-        if os.path.exists(f):
-            st.image(f, use_container_width=True)
-            logo_found = True
-            break
+    if os.path.exists("logo.jpg"):
+        st.image("logo.jpg", use_container_width=True)
 
-# Hero Header
 st.markdown("""
     <div class="hero-card">
-        <h1 style="color: #ffffff !important; margin-bottom: 4px; font-size: 34px; font-weight: 800; letter-spacing: 1px;">N2 CARE TELECLINIC</h1>
-        <p style="font-size: 18px; font-style: italic; color: #bae6fd !important; font-weight: 600; margin-top: 0;">"Your Friendly Second Opinion"</p>
-        <p style="font-size: 14px; color: #f1f5f9 !important; margin-top: -6px;">One Care. Many Specialties. One Purpose.</p>
-        <div style="margin-top: 18px;">
+        <h1 style="color: #ffffff !important; margin-bottom: 4px; font-size: 32px; font-weight: 800; letter-spacing: 0.5px;">N2 CARE TELECLINIC</h1>
+        <p style="font-size: 17px; font-style: italic; color: #bae6fd !important; font-weight: 600; margin-top: 0;">"Your Friendly Second Opinion"</p>
+        <p style="font-size: 13px; color: #f1f5f9 !important; margin-top: -6px;">One Care. Many Specialties. One Purpose.</p>
+        <div style="margin-top: 15px;">
             <div class="badge-pill">
                 <span style="color: white !important;">👨‍⚕️ <b>Dr. Vigneshwar</b> | MBBS, MD General Medicine</span><br>
                 <small style="color: #bae6fd !important;">✓ TNMC Reg No: 159693</small>
@@ -188,7 +200,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# Status Banners
+# Operational Status Banners
 p_col1, p_col2, p_col3 = st.columns(3)
 p_col1.error(f"🏷️ Consultation Fee: {CONSULTATION_FEE} Only")
 p_col2.info(f"📩 Report Submission: {BOOKING_HOURS}")
@@ -337,7 +349,7 @@ with tab1:
 
     st.markdown("---")
 
-    # Interactive FAQs
+    # FAQs
     st.subheader("❓ Frequently Asked Questions (FAQs)")
     with st.expander("1. How do I upload my blood or scan reports?"):
         st.write("You can attach report photos/PDFs directly in our WhatsApp chat, or paste your Google Drive / Cloud link in the consultation request builder above.")
