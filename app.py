@@ -5,14 +5,14 @@ from datetime import datetime
 import urllib.parse
 import os
 
-# 1. Page Configuration and Initialization
+# 1. Page Configuration
 st.set_page_config(
-    page_title="N2 Care Teleclinic | Premium Second Opinion Portal",
+    page_title="N2 Care Teleclinic | Official Second Opinion Portal",
     page_icon="🩺",
     layout="wide"
 )
 
-# App Configuration Variables
+# Configuration Variables
 CLINIC_PHONE = "919486872627"
 UPI_ID = "9486872627@upi"
 CONSULTATION_FEE = "₹100"
@@ -60,17 +60,14 @@ def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# 3. Comprehensive Global Styling with Optimized Design Overrides
-# Integrated from render reference image image_13.png and visual target reference image image_14.png
+# 3. Clean CSS Styling
 st.markdown("""
 <style>
-    /* Global Background - Warm Cream Aesthetic Overrides Indentation issues seen in previous renders */
     .stApp {
         background: linear-gradient(180deg, #fffbeb 0%, #ffffff 350px, #fafaf9 100%) !important;
         font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* Executive Emergency Header Bar */
     .emergency-bar {
         display: flex;
         justify-content: space-between;
@@ -98,8 +95,6 @@ st.markdown("""
         box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
     }
 
-    /* Standardized Gold-Bordered Premium Cards (Unified across app) */
-    /* Applied to Service Modules and all distinct containers as seen in image_14.png */
     .warm-card {
         background: #ffffff !important;
         border: 1px solid #dda15e;
@@ -107,19 +102,6 @@ st.markdown("""
         border-radius: 16px;
         box-shadow: 0 8px 24px rgba(188, 108, 37, 0.08);
         height: 100%;
-    }
-    
-    /* Optimized Hero Banner Section - Prominent Logo Placement */
-    /* Integrated structure from mockup image_14.png to replace bland previous banner in image_13.png */
-    .hero-card {
-        background: #ffffff !important;
-        border: 2px solid #dda15e;
-        padding: 25px 20px;
-        border-radius: 18px;
-        color: #0b3c5d !important;
-        text-align: center;
-        box-shadow: 0 12px 30px rgba(188, 108, 37, 0.1);
-        margin-bottom: 20px;
     }
     
     .btn-wa {
@@ -134,7 +116,6 @@ st.markdown("""
         box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35);
     }
     
-    /* Doctor Badge styling */
     .doc-box {
         background: #ffffff !important;
         border: 1px solid #dda15e;
@@ -162,7 +143,6 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
 
-    /* Global Typography Overrides for high contrast and executive medical feel */
     h1, h2, h3, h4 {
         color: #0b3c5d !important;
         font-weight: 800 !important;
@@ -178,27 +158,30 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Top Urgent Helpline Bar
-st.markdown(f"""
+st.markdown("""
     <div class="emergency-bar">
         <span class="emergency-text">🚨 Urgent Clinical Helpline: +91 94868 72627</span>
         <a href="tel:919486872627" class="btn-emergency">📞 Call Clinic Now</a>
     </div>
 """, unsafe_allow_html=True)
 
-# Optimized Header Section with Integrated Logo and Premium Banner
-# Logo rendering logic with alignment overrides
-col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
-with col_l2:
-    if os.path.exists("logo.jpg"):
-        st.image("logo.jpg", use_container_width=True)
+# Hero Section: Replaced bland text block with New Attractively Rendered Banner Image
+hero_banner_files = ["hero_banner.png", "hero_banner.jpg", "116795.png"]
+banner_found = False
+for b in hero_banner_files:
+    if os.path.exists(b):
+        st.image(b, use_container_width=True)
+        banner_found = True
+        break
 
-st.markdown("""
-    <div class="hero-card">
-        <h1 style="color: #0b3c5d !important; margin-bottom: 4px; font-size: 32px; font-weight: 800; letter-spacing: 0.5px;">N2 CARE TELECLINIC</h1>
-        <p style="font-size: 17px; font-style: italic; color: #283618 !important; font-weight: 600; margin-top: 0;">"Your Friendly Second Opinion"</p>
-        <p style="font-size: 13px; color: #57534e !important; margin-top: -6px;">Our Care. Many Specialties. One Purpose.</p>
-    </div>
-""", unsafe_allow_html=True)
+if not banner_found:
+    # Fallback to Top Hospital Logo if Hero Banner is missing
+    col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
+    with col_l2:
+        if os.path.exists("logo.jpg"):
+            st.image("logo.jpg", use_container_width=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 # Verified Doctors Section
 doc_col1, doc_col2 = st.columns(2)
@@ -222,7 +205,6 @@ with doc_col2:
         </div>
     """, unsafe_allow_html=True)
 
-# Spacing adjustment
 st.markdown("<br>", unsafe_allow_html=True)
 
 # Operational Status Banners
@@ -233,7 +215,7 @@ p_col3.success(f"🩺 MD Doctor Review: {REVIEW_HOURS}")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Navigation Tabs with Unified Styling
+# Navigation Tabs
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🤝 Patient Portal & Booking",
     "🩺 Specialty Second Opinion Packages",
@@ -295,10 +277,9 @@ with tab1:
         </a>
     ''', unsafe_allow_html=True)
 
-    # Spacing adjustment
     st.markdown("---")
 
-    # Specialized Service Modules with Unified Card Styling
+    # Service Modules
     col_a, col_b = st.columns(2)
 
     with col_a:
@@ -375,7 +356,7 @@ with tab1:
 
     st.markdown("---")
 
-    # Informative FAQs
+    # FAQs
     st.subheader("❓ Frequently Asked Questions (FAQs)")
     with st.expander("1. How do I upload my blood or scan reports?"):
         st.write("You can attach report photos/PDFs directly in our WhatsApp chat, or paste your Google Drive / Cloud link in the consultation request builder above.")
@@ -386,7 +367,7 @@ with tab1:
 
     st.markdown("---")
     
-    # UPI Payment Section with Aligned Design
+    # UPI Payment Section
     st.subheader("💳 Instant ₹100 Payment Portal")
     pay_col1, pay_col2 = st.columns([1, 2])
     
@@ -529,7 +510,7 @@ with tab3:
             </div>
         """, unsafe_allow_html=True)
 
-# TAB 4: Doctor Entry (PIN Protected)
+# TAB 4: Doctor Entry
 with tab4:
     st.subheader("🔒 Doctor Internal Portal")
     pin_input_1 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin1")
