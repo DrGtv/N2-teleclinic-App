@@ -5,14 +5,14 @@ from datetime import datetime
 import urllib.parse
 import os
 
-# 1. Page Configuration
+# 1. Page Configuration and Initialization
 st.set_page_config(
-    page_title="N2 Care Teleclinic | Official Teleconsultation Portal",
+    page_title="N2 Care Teleclinic | Premium Second Opinion Portal",
     page_icon="🩺",
     layout="wide"
 )
 
-# Configuration Variables
+# App Configuration Variables
 CLINIC_PHONE = "919486872627"
 UPI_ID = "9486872627@upi"
 CONSULTATION_FEE = "₹100"
@@ -60,118 +60,169 @@ def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# 3. Clean CSS Styling
+# 3. Comprehensive Global Styling with Optimized Design Overrides
+# Integrated from render reference image image_13.png and visual target reference image image_14.png
 st.markdown("""
 <style>
-.stApp {
-    background: linear-gradient(180deg, #fefae0 0%, #fffdf5 350px, #faf8ed 100%) !important;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-}
-.emergency-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #283618;
-    padding: 12px 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    border: 2px solid #dda15e;
-}
-.hero-card {
-    background: linear-gradient(135deg, #0b3c5d 0%, #0284c7 100%) !important;
-    border: 2px solid #dda15e;
-    padding: 25px 20px;
-    border-radius: 20px;
-    color: #ffffff !important;
-    text-align: center;
-    box-shadow: 0 12px 28px rgba(11, 60, 93, 0.2);
-    margin-bottom: 20px;
-}
-.doc-box {
-    background: #ffffff !important;
-    border: 2px solid #dda15e;
-    border-radius: 14px;
-    padding: 16px;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-}
-.warm-card {
-    background: #ffffff !important;
-    border: 2px solid #dda15e;
-    padding: 22px;
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(188, 108, 37, 0.08);
-    height: 100%;
-}
-.btn-wa {
-    background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
-    color: white !important;
-    padding: 12px 24px;
-    font-weight: 700;
-    text-decoration: none;
-    border-radius: 10px;
-    display: inline-block;
-    margin-top: 12px;
-    box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35);
-}
-.btn-emergency {
-    background: #bc6c25;
-    color: white !important;
-    padding: 8px 16px;
-    font-weight: 700;
-    text-decoration: none;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(188, 108, 37, 0.3);
-}
-.inst-card {
-    border-left: 5px solid #bc6c25;
-    background: #ffffff !important;
-    padding: 14px 18px;
-    margin-bottom: 12px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-}
-.testimonial-box {
-    background: #ffffff;
-    border-left: 4px solid #dda15e;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-}
-h1, h2, h3, h4 {
-    color: #283618 !important;
-    font-weight: 800 !important;
-}
-p, span, li, label {
-    color: #1c1917 !important;
-}
+    /* Global Background - Warm Cream Aesthetic Overrides Indentation issues seen in previous renders */
+    .stApp {
+        background: linear-gradient(180deg, #fffbeb 0%, #ffffff 350px, #fafaf9 100%) !important;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    /* Executive Emergency Header Bar */
+    .emergency-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #0b3c5d;
+        padding: 10px 18px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        color: white;
+    }
+    
+    .emergency-text {
+        color: white !important;
+        font-weight: 700 !important;
+        font-size: 15px;
+    }
+    
+    .btn-emergency {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white !important;
+        padding: 8px 16px;
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Standardized Gold-Bordered Premium Cards (Unified across app) */
+    /* Applied to Service Modules and all distinct containers as seen in image_14.png */
+    .warm-card {
+        background: #ffffff !important;
+        border: 1px solid #dda15e;
+        padding: 22px;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(188, 108, 37, 0.08);
+        height: 100%;
+    }
+    
+    /* Optimized Hero Banner Section - Prominent Logo Placement */
+    /* Integrated structure from mockup image_14.png to replace bland previous banner in image_13.png */
+    .hero-card {
+        background: #ffffff !important;
+        border: 2px solid #dda15e;
+        padding: 25px 20px;
+        border-radius: 18px;
+        color: #0b3c5d !important;
+        text-align: center;
+        box-shadow: 0 12px 30px rgba(188, 108, 37, 0.1);
+        margin-bottom: 20px;
+    }
+    
+    .btn-wa {
+        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        color: white !important;
+        padding: 12px 24px;
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 10px;
+        display: inline-block;
+        margin-top: 12px;
+        box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35);
+    }
+    
+    /* Doctor Badge styling */
+    .doc-box {
+        background: #ffffff !important;
+        border: 1px solid #dda15e;
+        border-radius: 14px;
+        padding: 16px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(188, 108, 37, 0.06);
+    }
+    
+    .inst-card {
+        border-left: 5px solid #283618;
+        background: #ffffff !important;
+        padding: 14px 18px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    .testimonial-box {
+        background: #ffffff;
+        border-left: 4px solid #dda15e;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    /* Global Typography Overrides for high contrast and executive medical feel */
+    h1, h2, h3, h4 {
+        color: #0b3c5d !important;
+        font-weight: 800 !important;
+    }
+    p, span, li {
+        color: #1e293b !important;
+    }
+    label {
+        color: #283618 !important;
+        font-weight: 600 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # Top Urgent Helpline Bar
-st.markdown("""<div class="emergency-bar"><span style="color: #fefae0 !important; font-weight: 700; font-size: 15px;">🚨 Urgent Clinical Helpline: +91 94868 72627</span><a href="tel:919486872627" class="btn-emergency">📞 Call Clinic Now</a></div>""", unsafe_allow_html=True)
+st.markdown(f"""
+    <div class="emergency-bar">
+        <span class="emergency-text">🚨 Urgent Clinical Helpline: +91 94868 72627</span>
+        <a href="tel:919486872627" class="btn-emergency">📞 Call Clinic Now</a>
+    </div>
+""", unsafe_allow_html=True)
 
-# Logo Display
+# Optimized Header Section with Integrated Logo and Premium Banner
+# Logo rendering logic with alignment overrides
 col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
 with col_l2:
-    logo_files = ["logo.jpg", "logo.png", "logo.jpeg", "Logo.png"]
-    for f in logo_files:
-        if os.path.exists(f):
-            st.image(f, use_container_width=True)
-            break
+    if os.path.exists("logo.jpg"):
+        st.image("logo.jpg", use_container_width=True)
 
-# Hero Banner
-st.markdown("""<div class="hero-card"><h1 style="color: #ffffff !important; margin-bottom: 2px; font-size: 32px; font-weight: 800; letter-spacing: 0.5px;">N2 CARE TELECLINIC</h1><p style="font-size: 17px; font-style: italic; color: #bae6fd !important; font-weight: 600; margin-top: 0;">"Your Friendly Second Opinion"</p><p style="font-size: 13px; color: #f1f5f9 !important; margin-top: -6px;">Our Care. Many Specialties. One Purpose.</p></div>""", unsafe_allow_html=True)
+st.markdown("""
+    <div class="hero-card">
+        <h1 style="color: #0b3c5d !important; margin-bottom: 4px; font-size: 32px; font-weight: 800; letter-spacing: 0.5px;">N2 CARE TELECLINIC</h1>
+        <p style="font-size: 17px; font-style: italic; color: #283618 !important; font-weight: 600; margin-top: 0;">"Your Friendly Second Opinion"</p>
+        <p style="font-size: 13px; color: #57534e !important; margin-top: -6px;">Our Care. Many Specialties. One Purpose.</p>
+    </div>
+""", unsafe_allow_html=True)
 
 # Verified Doctors Section
 doc_col1, doc_col2 = st.columns(2)
 with doc_col1:
-    st.markdown("""<div class="doc-box"><div style="font-size: 30px; margin-bottom: 5px;">👨‍⚕️</div><b style="color: #0b3c5d !important; font-size: 17px;">Dr. Vigneshwar</b><br><span style="font-size: 13px; color: #475569;">MBBS, MD General Medicine</span><br><small style="color: #0284c7; font-weight: bold;">✓ TNMC Reg No: 159693</small></div>""", unsafe_allow_html=True)
+    st.markdown("""
+        <div class="doc-box">
+            <div style="font-size: 30px; margin-bottom: 5px;">👨‍⚕️</div>
+            <b style="color: #0b3c5d !important; font-size: 17px;">Dr. Vigneshwar</b><br>
+            <span style="font-size: 13px; color: #475569;">MBBS, MD General Medicine</span><br>
+            <small style="color: #0284c7; font-weight: bold;">✓ TNMC Reg No: 159693</small>
+        </div>
+    """, unsafe_allow_html=True)
 
 with doc_col2:
-    st.markdown("""<div class="doc-box"><div style="font-size: 30px; margin-bottom: 5px;">👩‍⚕️</div><b style="color: #0b3c5d !important; font-size: 17px;">Dr. S. Malathi</b><br><span style="font-size: 13px; color: #475569;">MBBS, MD General Medicine</span><br><small style="color: #0284c7; font-weight: bold;">✓ TNMC Verified Practitioner</small></div>""", unsafe_allow_html=True)
+    st.markdown("""
+        <div class="doc-box">
+            <div style="font-size: 30px; margin-bottom: 5px;">👩‍⚕️</div>
+            <b style="color: #0b3c5d !important; font-size: 17px;">Dr. S. Malathi</b><br>
+            <span style="font-size: 13px; color: #475569;">MBBS, MD General Medicine</span><br>
+            <small style="color: #0284c7; font-weight: bold;">✓ TNMC Verified Practitioner</small>
+        </div>
+    """, unsafe_allow_html=True)
 
+# Spacing adjustment
 st.markdown("<br>", unsafe_allow_html=True)
 
 # Operational Status Banners
@@ -182,7 +233,7 @@ p_col3.success(f"🩺 MD Doctor Review: {REVIEW_HOURS}")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# Navigation Tabs
+# Navigation Tabs with Unified Styling
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🤝 Patient Portal & Booking",
     "🩺 Specialty Second Opinion Packages",
@@ -191,11 +242,32 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🔒 Database & E-Prescription"
 ])
 
-# TAB 1: Patient Portal
+# TAB 1: Patient Consultation Portal
 with tab1:
-    st.markdown("""<div class="warm-card" style="margin-bottom: 25px; text-align: center;"><h3 style="color: #283618 !important; margin-top: 0; font-weight: 800;">✨ How Your Online Second Opinion Works</h3><div style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: center; margin-top: 20px; gap: 15px;"><div style="flex: 1; min-width: 220px; background: #fefae0; padding: 18px; border-radius: 12px; border: 1px solid #dda15e;"><div style="font-size: 32px;">1️⃣</div><b style="color: #283618 !important; font-size: 16px;">Send Reports</b><p style="font-size: 13px; color: #44403c !important; margin-top: 6px;">Share blood tests, CT/MRI links, or voice notes on WhatsApp between 9 AM - 3 PM.</p></div><div style="flex: 1; min-width: 220px; background: #fefae0; padding: 18px; border-radius: 12px; border: 1px solid #dda15e;"><div style="font-size: 32px;">2️⃣</div><b style="color: #283618 !important; font-size: 16px;">Specialist Review</b><p style="font-size: 13px; color: #44403c !important; margin-top: 6px;">MD General Medicine specialists analyze your clinical history daily from 4 PM - 6 PM.</p></div><div style="flex: 1; min-width: 220px; background: #fefae0; padding: 18px; border-radius: 12px; border: 1px solid #dda15e;"><div style="font-size: 32px;">3️⃣</div><b style="color: #283618 !important; font-size: 16px;">Receive Guidance</b><p style="font-size: 13px; color: #44403c !important; margin-top: 6px;">Get clear diagnosis validation, drug safety checks, or diet advice directly on WhatsApp.</p></div></div></div>""", unsafe_allow_html=True)
+    st.markdown("""
+        <div class="warm-card" style="margin-bottom: 25px; text-align: center;">
+            <h3 style="color: #0b3c5d !important; margin-top: 0; font-weight: 800;">✨ How Your Online Second Opinion Works</h3>
+            <div style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: center; margin-top: 20px; gap: 15px;">
+                <div style="flex: 1; min-width: 220px; background: #fffbeb; padding: 18px; border-radius: 12px; border: 1px solid #dda15e;">
+                    <div style="font-size: 32px;">1️⃣</div>
+                    <b style="color: #0b3c5d !important; font-size: 16px;">Send Reports</b>
+                    <p style="font-size: 13px; color: #1e293b !important; margin-top: 6px;">Share blood tests, CT/MRI links, or voice notes on WhatsApp between 9 AM - 3 PM.</p>
+                </div>
+                <div style="flex: 1; min-width: 220px; background: #fffbeb; padding: 18px; border-radius: 12px; border: 1px solid #dda15e;">
+                    <div style="font-size: 32px;">2️⃣</div>
+                    <b style="color: #0b3c5d !important; font-size: 16px;">Specialist Review</b>
+                    <p style="font-size: 13px; color: #1e293b !important; margin-top: 6px;">MD General Medicine specialists analyze your clinical history daily from 4 PM - 6 PM.</p>
+                </div>
+                <div style="flex: 1; min-width: 220px; background: #fffbeb; padding: 18px; border-radius: 12px; border: 1px solid #dda15e;">
+                    <div style="font-size: 32px;">3️⃣</div>
+                    <b style="color: #0b3c5d !important; font-size: 16px;">Receive Guidance</b>
+                    <p style="font-size: 13px; color: #1e293b !important; margin-top: 6px;">Get clear diagnosis validation, drug safety checks, or diet advice directly on WhatsApp.</p>
+                </div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
-    # Direct Request Builder
+    # Interactive Direct Consultation Request Builder
     st.subheader("📋 Direct Consultation Request Builder")
     col_q1, col_q2 = st.columns(2)
     with col_q1:
@@ -217,26 +289,67 @@ with tab1:
     if notes_input:
         combined_query += f" | Notes: {notes_input}"
 
-    st.markdown(f'''<a href="{get_whatsapp_url(query_type, combined_query)}" target="_blank" class="btn-wa" style="font-size: 16px;">💬 Launch WhatsApp Consultation Request (Fee: {CONSULTATION_FEE})</a>''', unsafe_allow_html=True)
+    st.markdown(f'''
+        <a href="{get_whatsapp_url(query_type, combined_query)}" target="_blank" class="btn-wa" style="font-size: 16px;">
+            💬 Launch WhatsApp Consultation Request (Fee: {CONSULTATION_FEE})
+        </a>
+    ''', unsafe_allow_html=True)
 
+    # Spacing adjustment
     st.markdown("---")
 
-    # Service Modules
+    # Specialized Service Modules with Unified Card Styling
     col_a, col_b = st.columns(2)
 
     with col_a:
-        st.markdown(f"""<div class="warm-card"><h4 style="color: #283618 !important; margin-top: 0; font-size: 18px;">🔬 Lab Report Review & Second Opinion</h4><p style="color: #44403c !important; font-size: 14px;">Unsure about blood tests or scans? Get an independent, expert MD review on diagnosis accuracy and safety.</p><p><b>Consultation Fee:</b> <span style="color: #bc6c25; font-weight: bold;">{CONSULTATION_FEE}</span></p><a href="{get_whatsapp_url('Lab Report Review & Second Opinion')}" target="_blank" class="btn-wa">💬 Book Second Opinion on WhatsApp</a></div>""", unsafe_allow_html=True)
+        st.markdown(f"""
+            <div class="warm-card">
+                <h4 style="color: #0b3c5d !important; margin-top: 0; font-size: 18px;">🔬 Lab Report Review & Second Opinion</h4>
+                <p style="color: #1e293b !important; font-size: 14px;">Unsure about blood tests or scans? Get an independent, expert MD review on diagnosis accuracy and safety.</p>
+                <p><b>Consultation Fee:</b> <span style="color: #283618; font-weight: bold;">{CONSULTATION_FEE}</span></p>
+                <a href="{get_whatsapp_url('Lab Report Review & Second Opinion')}" target="_blank" class="btn-wa">
+                    💬 Book Second Opinion on WhatsApp
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        st.markdown(f"""<div class="warm-card"><h4 style="color: #283618 !important; margin-top: 0; font-size: 18px;">💊 Medication & Side-Effect Safety Check</h4><p style="color: #44403c !important; font-size: 14px;">Verify drug dosages, understand potential side effects, check long-term drug safety, or resolve medication doubts.</p><p><b>Consultation Fee:</b> <span style="color: #bc6c25; font-weight: bold;">{CONSULTATION_FEE}</span></p><a href="{get_whatsapp_url('Drug & Medication Review')}" target="_blank" class="btn-wa">💬 Ask About Medicines</a></div>""", unsafe_allow_html=True)
+        st.markdown(f"""
+            <div class="warm-card">
+                <h4 style="color: #0b3c5d !important; margin-top: 0; font-size: 18px;">💊 Medication & Side-Effect Safety Check</h4>
+                <p style="color: #1e293b !important; font-size: 14px;">Verify drug dosages, understand potential side effects, check long-term drug safety, or resolve medication doubts.</p>
+                <p><b>Consultation Fee:</b> <span style="color: #283618; font-weight: bold;">{CONSULTATION_FEE}</span></p>
+                <a href="{get_whatsapp_url('Drug & Medication Review')}" target="_blank" class="btn-wa">
+                    💬 Ask About Medicines
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
     with col_b:
-        st.markdown(f"""<div class="warm-card"><h4 style="color: #283618 !important; margin-top: 0; font-size: 18px;">🥗 Clinical Diet & Lifestyle Guidance</h4><p style="color: #44403c !important; font-size: 14px;">Evidence-based dietary advice for managing Diabetes, Hypertension, Fatty Liver, Cholesterol, and Metabolic conditions.</p><p><b>Consultation Fee:</b> <span style="color: #bc6c25; font-weight: bold;">{CONSULTATION_FEE}</span></p><a href="{get_whatsapp_url('Diet & Nutrition Guidance')}" target="_blank" class="btn-wa">💬 Request Diet Guidance</a></div>""", unsafe_allow_html=True)
+        st.markdown(f"""
+            <div class="warm-card">
+                <h4 style="color: #0b3c5d !important; margin-top: 0; font-size: 18px;">🥗 Clinical Diet & Lifestyle Guidance</h4>
+                <p style="color: #1e293b !important; font-size: 14px;">Evidence-based dietary advice for managing Diabetes, Hypertension, Fatty Liver, Cholesterol, and Metabolic conditions.</p>
+                <p><b>Consultation Fee:</b> <span style="color: #283618; font-weight: bold;">{CONSULTATION_FEE}</span></p>
+                <a href="{get_whatsapp_url('Diet & Nutrition Guidance')}" target="_blank" class="btn-wa">
+                    💬 Request Diet Guidance
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        st.markdown(f"""<div class="warm-card"><h4 style="color: #283618 !important; margin-top: 0; font-size: 18px;">📈 Chronic Illness Tracker & Progression</h4><p style="color: #44403c !important; font-size: 14px;">Regular health check-ins to monitor disease trends over time and implement preventive steps for long-term health.</p><p><b>Consultation Fee:</b> <span style="color: #bc6c25; font-weight: bold;">{CONSULTATION_FEE}</span></p><a href="{get_whatsapp_url('Disease Progression Check')}" target="_blank" class="btn-wa">💬 Book Health Tracker</a></div>""", unsafe_allow_html=True)
+        st.markdown(f"""
+            <div class="warm-card">
+                <h4 style="color: #0b3c5d !important; margin-top: 0; font-size: 18px;">📈 Chronic Illness Tracker & Progression</h4>
+                <p style="color: #1e293b !important; font-size: 14px;">Regular health check-ins to monitor disease trends over time and implement preventive steps for long-term health.</p>
+                <p><b>Consultation Fee:</b> <span style="color: #283618; font-weight: bold;">{CONSULTATION_FEE}</span></p>
+                <a href="{get_whatsapp_url('Disease Progression Check')}" target="_blank" class="btn-wa">
+                    💬 Book Health Tracker
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("---")
     
@@ -244,13 +357,25 @@ with tab1:
     st.subheader("💬 What Our Patients Say")
     r_col1, r_col2 = st.columns(2)
     with r_col1:
-        st.markdown("""<div class="testimonial-box"><b>"Clear & Reassuring Guidance"</b><br><small style="color: #57534e !important;">"I was confused about my diabetes medication dosage changes. Dr. Vigneshwar explained everything clearly on WhatsApp!"</small><br><span style="color: #bc6c25 !important; font-size: 12px; font-weight: bold;">— Arvind S., Trichy</span></div>""", unsafe_allow_html=True)
+        st.markdown("""
+            <div class="testimonial-box">
+                <b>"Clear & Reassuring Guidance"</b><br>
+                <small style="color: #1e293b !important;">"I was confused about my diabetes medication dosage changes. Dr. Vigneshwar explained everything clearly on WhatsApp!"</small><br>
+                <span style="color: #0b3c5d !important; font-size: 12px; font-weight: bold;">— Arvind S., Trichy</span>
+            </div>
+        """, unsafe_allow_html=True)
     with r_col2:
-        st.markdown("""<div class="testimonial-box"><b>"Saved Time & Unnecessary Anxiety"</b><br><small style="color: #57534e !important;">"Shared my MRI report scan link. Got an expert second opinion within the evening review window. Exceptional service!"</small><br><span style="color: #bc6c25 !important; font-size: 12px; font-weight: bold;">— Divya R., Srirangam</span></div>""", unsafe_allow_html=True)
+        st.markdown("""
+            <div class="testimonial-box">
+                <b>"Saved Time & Unnecessary Anxiety"</b><br>
+                <small style="color: #1e293b !important;">"Shared my MRI report scan link. Got an expert second opinion within the evening review window. Exceptional service!"</small><br>
+                <span style="color: #0b3c5d !important; font-size: 12px; font-weight: bold;">— Divya R., Srirangam</span>
+            </div>
+        """, unsafe_allow_html=True)
 
     st.markdown("---")
 
-    # FAQs
+    # Informative FAQs
     st.subheader("❓ Frequently Asked Questions (FAQs)")
     with st.expander("1. How do I upload my blood or scan reports?"):
         st.write("You can attach report photos/PDFs directly in our WhatsApp chat, or paste your Google Drive / Cloud link in the consultation request builder above.")
@@ -261,7 +386,7 @@ with tab1:
 
     st.markdown("---")
     
-    # UPI Payment
+    # UPI Payment Section with Aligned Design
     st.subheader("💳 Instant ₹100 Payment Portal")
     pay_col1, pay_col2 = st.columns([1, 2])
     
@@ -269,9 +394,18 @@ with tab1:
         st.image(get_upi_qr_url(), caption="Scan using GPay / PhonePe / Paytm", width=200)
         
     with pay_col2:
-        st.markdown(f"""<div class="warm-card"><p style="margin-top: 0;"><b>Official Clinic UPI ID:</b> <code style="font-size: 16px; color: #283618; background: #fefae0; padding: 4px 8px; border-radius: 6px;">{UPI_ID}</code></p><p><b>Fee:</b> ₹100 Only</p><p><b>Official Contact / WhatsApp:</b> +91 94868 72627</p><p style="font-size: 13px; color: #57534e !important; margin-bottom: 0;">📌 <i>Once payment is completed, please share a screenshot of the confirmation in WhatsApp along with your health reports.</i></p></div>""", unsafe_allow_html=True)
+        st.markdown(f"""
+            <div class="warm-card">
+                <p style="margin-top: 0;"><b>Official Clinic UPI ID:</b> <code style="font-size: 16px; color: #0b3c5d; background: #fffbeb; padding: 4px 8px; border-radius: 6px;">{UPI_ID}</code></p>
+                <p><b>Fee:</b> ₹100 Only</p>
+                <p><b>Official Contact / WhatsApp:</b> +91 94868 72627</p>
+                <p style="font-size: 13px; color: #57534e !important; margin-bottom: 0;">
+                    📌 <i>Once payment is completed, please share a screenshot of the confirmation in WhatsApp along with your health reports.</i>
+                </p>
+            </div>
+        """, unsafe_allow_html=True)
 
-# TAB 2: Specialty Packages
+# TAB 2: Specialty Second Opinion Bundles
 with tab2:
     st.subheader("🩺 Specialty Second Opinion Packages")
     st.write("Structured report evaluation packages designed for specific health concerns:")
@@ -281,39 +415,121 @@ with tab2:
     with b_col1:
         if os.path.exists("card_diabetes.png"):
             st.image("card_diabetes.png", use_container_width=True)
-        st.markdown(f"""<div class="warm-card"><h4 style="color: #283618 !important; margin-top:0;">🩸 Diabetes & Metabolic Wellness Review</h4><p style="font-size: 13px; color: #44403c !important;">Ideal for Fasting Glucose, HbA1c, Lipid Profile & Kidney Function report validations.</p><p><b>Package Fee:</b> <span style="color: #bc6c25; font-weight: bold;">{CONSULTATION_FEE}</span></p><a href="{get_whatsapp_url('Diabetes & Metabolic Review')}" target="_blank" class="btn-wa">💬 Book Diabetes Review</a></div>""", unsafe_allow_html=True)
+        st.markdown(f"""
+            <div class="warm-card">
+                <h4 style="color: #0b3c5d !important; margin-top:0;">🩸 Diabetes & Metabolic Wellness Review</h4>
+                <p style="font-size: 13px; color: #1e293b !important;">Ideal for Fasting Glucose, HbA1c, Lipid Profile & Kidney Function report validations.</p>
+                <p><b>Package Fee:</b> <span style="color: #283618; font-weight: bold;">{CONSULTATION_FEE}</span></p>
+                <a href="{get_whatsapp_url('Diabetes & Metabolic Review')}" target="_blank" class="btn-wa">
+                    💬 Book Diabetes Review
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
         if os.path.exists("card_cardiac.png"):
             st.image("card_cardiac.png", use_container_width=True)
-        st.markdown(f"""<div class="warm-card"><h4 style="color: #283618 !important; margin-top:0;">❤️ Cardiac & Vascular Safety Check</h4><p style="font-size: 13px; color: #44403c !important;">Validation of ECG, Echo, Lipid markers, & Hypertension medication safety.</p><p><b>Package Fee:</b> <span style="color: #bc6c25; font-weight: bold;">{CONSULTATION_FEE}</span></p><a href="{get_whatsapp_url('Cardiac Report Review')}" target="_blank" class="btn-wa">💬 Book Cardiac Review</a></div>""", unsafe_allow_html=True)
+        st.markdown(f"""
+            <div class="warm-card">
+                <h4 style="color: #0b3c5d !important; margin-top:0;">❤️ Cardiac & Vascular Safety Check</h4>
+                <p style="font-size: 13px; color: #1e293b !important;">Validation of ECG, Echo, Lipid markers, & Hypertension medication safety.</p>
+                <p><b>Package Fee:</b> <span style="color: #283618; font-weight: bold;">{CONSULTATION_FEE}</span></p>
+                <a href="{get_whatsapp_url('Cardiac Report Review')}" target="_blank" class="btn-wa">
+                    💬 Book Cardiac Review
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
     with b_col2:
         if os.path.exists("card_womens.png"):
             st.image("card_womens.png", use_container_width=True)
-        st.markdown(f"""<div class="warm-card"><h4 style="color: #283618 !important; margin-top:0;">🌸 Women's Wellness & Hormonal Check</h4><p style="font-size: 13px; color: #44403c !important;">Thyroid profile, Vitamin D, Hb %, & PCOS metabolic evaluation.</p><p><b>Package Fee:</b> <span style="color: #bc6c25; font-weight: bold;">{CONSULTATION_FEE}</span></p><a href="{get_whatsapp_url('Womens Wellness Review')}" target="_blank" class="btn-wa">💬 Book Women's Check</a></div>""", unsafe_allow_html=True)
+        st.markdown(f"""
+            <div class="warm-card">
+                <h4 style="color: #0b3c5d !important; margin-top:0;">🌸 Women's Wellness & Hormonal Check</h4>
+                <p style="font-size: 13px; color: #1e293b !important;">Thyroid profile, Vitamin D, Hb %, & PCOS metabolic evaluation.</p>
+                <p><b>Package Fee:</b> <span style="color: #283618; font-weight: bold;">{CONSULTATION_FEE}</span></p>
+                <a href="{get_whatsapp_url('Womens Wellness Review')}" target="_blank" class="btn-wa">
+                    💬 Book Women's Check
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
         if os.path.exists("card_senior.png"):
             st.image("card_senior.png", use_container_width=True)
-        st.markdown(f"""<div class="warm-card"><h4 style="color: #283618 !important; margin-top:0;">👴 Senior Citizen Prescription & Safety Audit</h4><p style="font-size: 13px; color: #44403c !important;">Comprehensive drug safety audit, dosage check, & renal function safety review for elderly care.</p><p><b>Package Fee:</b> <span style="color: #bc6c25; font-weight: bold;">{CONSULTATION_FEE}</span></p><a href="{get_whatsapp_url('Senior Citizen Prescription Audit')}" target="_blank" class="btn-wa">💬 Book Elderly Prescription Audit</a></div>""", unsafe_allow_html=True)
+        st.markdown(f"""
+            <div class="warm-card">
+                <h4 style="color: #0b3c5d !important; margin-top:0;">👴 Senior Citizen Prescription & Safety Audit</h4>
+                <p style="font-size: 13px; color: #1e293b !important;">Comprehensive drug safety audit, dosage check, & renal function safety review for elderly care.</p>
+                <p><b>Package Fee:</b> <span style="color: #283618; font-weight: bold;">{CONSULTATION_FEE}</span></p>
+                <a href="{get_whatsapp_url('Senior Citizen Prescription Audit')}" target="_blank" class="btn-wa">
+                    💬 Book Elderly Prescription Audit
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
 
 # TAB 3: Directory
 with tab3:
     st.subheader("🌐 Regional & National Medical Referral Directory")
-    st.write("Explore major healthcare institutions across Tamil Nadu & India alongside **N2 Care Teleclinic**:")
+    st.write("Explore major healthcare institutions and specialized centers across Tamil Nadu & India alongside **N2 Care Teleclinic**:")
 
     dir_col1, dir_col2 = st.columns(2)
 
     with dir_col1:
-        st.markdown("""<div class="inst-card"><b>🩺 N2 Care Teleclinic</b> — <a href="https://n2-teleclinic-app-7wvhshbbbpegzz7hne4gr3.streamlit.app/" target="_blank">Official Portal</a><br><small style="color: #57534e !important;">₹100 Friendly Second Opinions | MD General Medicine Review</small></div><div class="inst-card"><b>🏥 Apollo Speciality Hospitals, Trichy</b> — <a href="https://www.apollohospitals.com/hospitals/apollo-speciality-hospitals-trichy" target="_blank">Official Website</a><br><small style="color: #57534e !important;">Advanced Multi-Specialty Tertiary Healthcare in Trichy</small></div><div class="inst-card"><b>🏥 Sri Ramakrishna Hospital, Trichy</b> — <a href="https://www.sriramakrishnahospitaltrichy.com/" target="_blank">Official Website</a><br><small style="color: #57534e !important;">Comprehensive Healthcare Services & Tertiary Care</small></div><div class="inst-card"><b>🏥 Ganga Hospital, Coimbatore</b> — <a href="https://www.gangahospital.com/" target="_blank">Official Website</a><br><small style="color: #57534e !important;">Premier Center for Orthopaedics, Trauma & Plastic Surgery</small></div><div class="inst-card"><b>🏥 KMCH (Kovai Medical Center & Hospital)</b> — <a href="https://kmchihsr.edu.in/" target="_blank">Official Website</a><br><small style="color: #57534e !important;">Multi-Specialty Institute & Health Sciences Research</small></div><div class="inst-card"><b>🏥 MIOT International, Chennai</b> — <a href="https://www.miotinternational.com/" target="_blank">Official Website</a><br><small style="color: #57534e !important;">Multi-Specialty Care & Advanced Surgical Excellence</small></div>""", unsafe_allow_html=True)
+        st.markdown("""
+            <div class="inst-card">
+                <b>🩺 N2 Care Teleclinic</b> — <a href="https://n2-teleclinic-app-7wvhshbbbpegzz7hne4gr3.streamlit.app/" target="_blank">Official Portal</a><br>
+                <small style="color: #1e293b !important;">₹100 Friendly Second Opinions | MD General Medicine Review</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 Apollo Speciality Hospitals, Trichy</b> — <a href="https://www.apollohospitals.com/hospitals/apollo-speciality-hospitals-trichy" target="_blank">Official Website</a><br>
+                <small style="color: #1e293b !important;">Advanced Multi-Specialty Tertiary Healthcare in Trichy</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 Sri Ramakrishna Hospital, Trichy</b> — <a href="https://www.sriramakrishnahospitaltrichy.com/" target="_blank">Official Website</a><br>
+                <small style="color: #1e293b !important;">Comprehensive Healthcare Services & Tertiary Care</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 Ganga Hospital, Coimbatore</b> — <a href="https://www.gangahospital.com/" target="_blank">Official Website</a><br>
+                <small style="color: #1e293b !important;">Premier Center for Orthopaedics, Trauma & Plastic Surgery</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 KMCH (Kovai Medical Center & Hospital)</b> — <a href="https://kmchihsr.edu.in/" target="_blank">Official Website</a><br>
+                <small style="color: #1e293b !important;">Multi-Specialty Institute & Health Sciences Research</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 MIOT International, Chennai</b> — <a href="https://www.miotinternational.com/" target="_blank">Official Website</a><br>
+                <small style="color: #1e293b !important;">Multi-Specialty Care & Advanced Surgical Excellence</small>
+            </div>
+        """, unsafe_allow_html=True)
 
     with dir_col2:
-        st.markdown("""<div class="inst-card"><b>🏥 Christian Medical College (CMC), Vellore</b> — <a href="https://admissions.cmcvellore.ac.in/" target="_blank">Official Website</a><br><small style="color: #57534e !important;">Premier Tertiary Medical Research Institution</small></div><div class="inst-card"><b>🏛️ AIIMS New Delhi</b> — <a href="https://www.aiims.edu/" target="_blank">Official Website</a><br><small style="color: #57534e !important;">Apex Autonomous Medical Institute of National Importance</small></div><div class="inst-card"><b>🔬 Tata Memorial Centre, Mumbai</b> — <a href="https://tmc.gov.in/" target="_blank">Official Website</a><br><small style="color: #57534e !important;">National Comprehensive Cancer Care & Research Center</small></div><div class="inst-card"><b>🏥 Medanta – The Medicity, Gurugram</b> — <a href="https://www.medanta.org/" target="_blank">Official Website</a><br><small style="color: #57534e !important;">Multi-Super Specialty Institute for Complex Care</small></div><div class="inst-card"><b>🏛️ PGIMER, Chandigarh</b> — <a href="https://pgimer.edu.in/" target="_blank">Official Website</a><br><small style="color: #57534e !important;">Postgraduate Institute of Medical Education & Research</small></div>""", unsafe_allow_html=True)
+        st.markdown("""
+            <div class="inst-card">
+                <b>🏥 Christian Medical College (CMC), Vellore</b> — <a href="https://admissions.cmcvellore.ac.in/" target="_blank">Official Website</a><br>
+                <small style="color: #1e293b !important;">Premier Tertiary Medical Research Institution</small>
+            </div>
+            <div class="inst-card">
+                <b>🏛️ AIIMS New Delhi</b> — <a href="https://www.aiims.edu/" target="_blank">Official Website</a><br>
+                <small style="color: #1e293b !important;">Apex Autonomous Medical Institute of National Importance</small>
+            </div>
+            <div class="inst-card">
+                <b>🔬 Tata Memorial Centre, Mumbai</b> — <a href="https://tmc.gov.in/" target="_blank">Official Website</a><br>
+                <small style="color: #1e293b !important;">National Comprehensive Cancer Care & Research Center</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 Medanta – The Medicity, Gurugram</b> — <a href="https://www.medanta.org/" target="_blank">Official Website</a><br>
+                <small style="color: #1e293b !important;">Multi-Super Specialty Institute for Complex Care</small>
+            </div>
+            <div class="inst-card">
+                <b>🏛️ PGIMER, Chandigarh</b> — <a href="https://pgimer.edu.in/" target="_blank">Official Website</a><br>
+                <small style="color: #1e293b !important;">Postgraduate Institute of Medical Education & Research</small>
+            </div>
+        """, unsafe_allow_html=True)
 
-# TAB 4: Doctor Entry
+# TAB 4: Doctor Entry (PIN Protected)
 with tab4:
     st.subheader("🔒 Doctor Internal Portal")
     pin_input_1 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin1")
@@ -393,7 +609,7 @@ with tab4:
     elif pin_input_1:
         st.error("Incorrect Passcode.")
 
-# TAB 5: Database & Rx Pad
+# TAB 5: Searchable Database & Rx Pad
 with tab5:
     st.subheader("🔒 Doctor Internal Portal")
     pin_input_2 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin2")
@@ -423,7 +639,33 @@ with tab5:
             
             patient_row = df_filtered[df_filtered['patient_id'] == selected_id].iloc[0]
 
-            st.markdown(f"""<div style="border: 2px solid #283618; padding: 30px; border-radius: 12px; background-color: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05);"><div style="text-align: center; border-bottom: 2px solid #283618; padding-bottom: 12px; margin-bottom: 20px;"><h2 style="color: #283618 !important; margin: 0; letter-spacing: 1px;">N2 CARE TELECLINIC</h2><p style="margin: 3px 0; font-style: italic; font-weight: 700; color: #bc6c25 !important;">"Your Friendly Second Opinion"</p><small style="color: #57534e !important;"><b>Dr. Vigneshwar</b>, MBBS, MD (TNMC Reg No 159693) | <b>Dr. S. Malathi</b>, MBBS, MD</small><br><small style="color: #57534e !important;">WhatsApp: +91 94868 72627 | UPI: 9486872627@upi</small></div><div style="display: flex; justify-content: space-between; font-size: 14px;"><div><b>Patient ID:</b> N2-{patient_row['patient_id']}</div><div><b>Date:</b> {patient_row['entry_date']}</div></div><hr style="border: 0.5px solid #dda15e;"><p style="font-size: 14px;"><b>Patient Name:</b> {patient_row['patient_name']} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Age/Gender:</b> {patient_row['age']} yrs / {patient_row['gender']} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Phone:</b> {patient_row['phone']}</p><p style="font-size: 14px;"><b>Consultation Focus:</b> {patient_row['consultation_type']} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Review Slot:</b> {patient_row['preferred_slot']}</p><p style="font-size: 14px;"><b>Vitals:</b> BP: {patient_row['bp']} | Pulse: {patient_row['pulse']} | SpO2: {patient_row['spo2']} | Temp: {patient_row['temp']}</p><hr style="border: 0.5px solid #dda15e;"><p><b>Chief Complaints:</b><br>{patient_row['complaints']}</p><p><b>Investigations / Scans Review:</b><br>{patient_row['investigation']}</p><p><b>Clinical Advice & Notes:</b><br>{patient_row['treatment_history']}</p><hr style="border: 0.5px solid #dda15e;"><h4 style="color: #bc6c25 !important; margin-bottom: 5px;">💊 Rx (Prescription):</h4><p style="background-color: #fefae0; padding: 15px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; border: 1px solid #dda15e;">{patient_row['prescription_details']}</p><hr style="border: 0.5px solid #dda15e;"><p style="text-align: right; font-size: 14px;"><b>Next Recommended Follow-Up Date:</b> {patient_row['followup_date']}</p></div>""", unsafe_allow_html=True)
+            st.markdown(f"""
+                <div style="border: 2px solid #0b3c5d; padding: 30px; border-radius: 12px; background-color: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                    <div style="text-align: center; border-bottom: 2px solid #0b3c5d; padding-bottom: 12px; margin-bottom: 20px;">
+                        <h2 style="color: #0b3c5d !important; margin: 0; letter-spacing: 1px;">N2 CARE TELECLINIC</h2>
+                        <p style="margin: 3px 0; font-style: italic; font-weight: 700; color: #283618 !important;">"Your Friendly Second Opinion"</p>
+                        <small style="color: #1e293b !important;"><b>Dr. Vigneshwar</b>, MBBS, MD (TNMC Reg No 159693) | <b>Dr. S. Malathi</b>, MBBS, MD</small><br>
+                        <small style="color: #57534e !important;">WhatsApp: +91 94868 72627 | UPI: 9486872627@upi</small>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 14px;">
+                        <div><b>Patient ID:</b> N2-{patient_row['patient_id']}</div>
+                        <div><b>Date:</b> {patient_row['entry_date']}</div>
+                    </div>
+                    <hr style="border: 0.5px solid #dda15e;">
+                    <p style="font-size: 14px;"><b>Patient Name:</b> {patient_row['patient_name']} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Age/Gender:</b> {patient_row['age']} yrs / {patient_row['gender']} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Phone:</b> {patient_row['phone']}</p>
+                    <p style="font-size: 14px;"><b>Consultation Focus:</b> {patient_row['consultation_type']} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Review Slot:</b> {patient_row['preferred_slot']}</p>
+                    <p style="font-size: 14px;"><b>Vitals:</b> BP: {patient_row['bp']} | Pulse: {patient_row['pulse']} | SpO2: {patient_row['spo2']} | Temp: {patient_row['temp']}</p>
+                    <hr style="border: 0.5px solid #dda15e;">
+                    <p><b>Chief Complaints:</b><br>{patient_row['complaints']}</p>
+                    <p><b>Investigations / Scans Review:</b><br>{patient_row['investigation']}</p>
+                    <p><b>Clinical Advice & Notes:</b><br>{patient_row['treatment_history']}</p>
+                    <hr style="border: 0.5px solid #dda15e;">
+                    <h4 style="color: #ef4444 !important; margin-bottom: 5px;">💊 Rx (Prescription):</h4>
+                    <p style="background-color: #fffbeb; padding: 15px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; border: 1px solid #dda15e;">{patient_row['prescription_details']}</p>
+                    <hr style="border: 0.5px solid #dda15e;">
+                    <p style="text-align: right; font-size: 14px;"><b>Next Recommended Follow-Up Date:</b> {patient_row['followup_date']}</p>
+                </div>
+            """, unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
             csv_data = df.to_csv(index=False).encode('utf-8')
