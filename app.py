@@ -8,7 +8,7 @@ import base64
 
 # 1. Page Configuration
 st.set_page_config(
-    page_title="N2 Care Teleclinic | Watermark Background Portal",
+    page_title="N2 Care Teleclinic | Official Teleconsultation Portal",
     page_icon="🩺",
     layout="wide"
 )
@@ -61,9 +61,9 @@ def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# Base64 Image Background Watermark Encoder
-def set_background_watermark():
-    bg_files = ["logo.jpg", "logo.png", "logo.jpeg", "116755.jpg", "116741.jpg"]
+# Full HD Hospital Background Encoder
+def set_full_hospital_background():
+    bg_files = ["logo.jpg", "logo.png", "logo.jpeg", "116755.jpg", "116741.jpg", "116761.jpg"]
     encoded_str = ""
     for file in bg_files:
         if os.path.exists(file):
@@ -74,30 +74,39 @@ def set_background_watermark():
     if encoded_str:
         st.markdown(f"""
         <style>
+            /* Direct Full Hospital Background with slight dark tint for high text readability */
             .stApp {{
-                background-image: linear-gradient(rgba(240, 249, 255, 0.88), rgba(255, 255, 255, 0.92)), url("data:image/jpg;base64,{encoded_str}") !important;
+                background-image: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.55)), url("data:image/jpg;base64,{encoded_str}") !important;
                 background-size: cover !important;
                 background-position: center !important;
                 background-repeat: no-repeat !important;
                 background-attachment: fixed !important;
             }}
+            
+            /* Glass Translucent Cards - No Heavy Solid White */
             .glass-card {{
-                background: rgba(255, 255, 255, 0.92) !important;
-                backdrop-filter: blur(8px);
-                border: 1px solid rgba(226, 232, 240, 0.9);
-                padding: 24px;
+                background: rgba(255, 255, 255, 0.85) !important;
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.6);
+                padding: 22px;
                 border-radius: 16px;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+                height: 100%;
             }}
+            
+            /* Dark Glass Hero Banner */
             .hero-card {{
-                background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(11, 60, 93, 0.92) 60%, rgba(2, 132, 199, 0.9) 100%);
-                padding: 35px 25px;
+                background: rgba(11, 60, 93, 0.85) !important;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                padding: 30px 20px;
                 border-radius: 20px;
                 color: white;
                 text-align: center;
-                box-shadow: 0 20px 35px rgba(11, 60, 93, 0.2);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
                 margin-bottom: 25px;
             }}
+            
             .btn-wa {{
                 background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
                 color: white !important;
@@ -107,10 +116,11 @@ def set_background_watermark():
                 border-radius: 10px;
                 display: inline-block;
                 margin-top: 12px;
-                box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35);
+                box-shadow: 0 6px 15px rgba(37, 211, 102, 0.4);
             }}
+            
             .badge-pill {{
-                background: rgba(255, 255, 255, 0.18);
+                background: rgba(255, 255, 255, 0.2);
                 backdrop-filter: blur(5px);
                 border: 1px solid rgba(255, 255, 255, 0.3);
                 padding: 10px 18px;
@@ -118,31 +128,33 @@ def set_background_watermark():
                 display: inline-block;
                 margin: 5px;
             }}
+            
             .inst-card {{
                 border-left: 5px solid #0284c7;
-                background: rgba(255, 255, 255, 0.95);
+                background: rgba(255, 255, 255, 0.88) !important;
+                backdrop-filter: blur(8px);
                 padding: 14px 18px;
                 margin-bottom: 12px;
                 border-radius: 10px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }}
+            
+            /* Make text headings crisp against background */
+            h1, h2, h3, h4 {{
+                text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15);
             }}
         </style>
         """, unsafe_allow_html=True)
 
-set_background_watermark()
+set_full_hospital_background()
 
 # 3. Hero Header
-col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
-with col_l2:
-    if os.path.exists("logo.jpg"):
-        st.image("logo.jpg", use_container_width=True)
-
 st.markdown("""
     <div class="hero-card">
         <h1 style="color: #ffffff; margin-bottom: 4px; font-size: 34px; font-weight: 800; letter-spacing: 1px;">N2 CARE TELECLINIC</h1>
         <p style="font-size: 18px; font-style: italic; color: #38bdf8; font-weight: 600; margin-top: 0;">"Your Friendly Second Opinion"</p>
-        <p style="font-size: 14px; color: #cbd5e1; margin-top: -6px;">One Care. Many Specialties. One Purpose.</p>
-        <div style="margin-top: 20px;">
+        <p style="font-size: 14px; color: #e2e8f0; margin-top: -6px;">One Care. Many Specialties. One Purpose.</p>
+        <div style="margin-top: 18px;">
             <div class="badge-pill">
                 👨‍⚕️ <b>Dr. Vigneshwar</b> | MBBS, MD General Medicine <br>
                 <small style="color: #38bdf8;">✓ TNMC Reg No: 159693</small>
@@ -177,26 +189,26 @@ with tab1:
         <div class="glass-card" style="margin-bottom: 25px; text-align: center;">
             <h3 style="color: #0b3c5d; margin-top: 0; font-weight: 700;">✨ How Your Online Second Opinion Works</h3>
             <div style="display: flex; justify-content: space-around; flex-wrap: wrap; text-align: center; margin-top: 20px; gap: 15px;">
-                <div style="flex: 1; min-width: 220px; background: rgba(248, 250, 252, 0.9); padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <div style="flex: 1; min-width: 220px; background: rgba(255, 255, 255, 0.7); padding: 18px; border-radius: 12px; border: 1px solid rgba(226, 232, 240, 0.8);">
                     <div style="font-size: 32px;">1️⃣</div>
                     <b style="color: #0f172a; font-size: 16px;">Send Reports</b>
-                    <p style="font-size: 13px; color: #64748b; margin-top: 6px;">Share blood tests, CT/MRI links, or voice notes on WhatsApp between 9 AM - 3 PM.</p>
+                    <p style="font-size: 13px; color: #475569; margin-top: 6px;">Share blood tests, CT/MRI links, or voice notes on WhatsApp between 9 AM - 3 PM.</p>
                 </div>
-                <div style="flex: 1; min-width: 220px; background: rgba(248, 250, 252, 0.9); padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <div style="flex: 1; min-width: 220px; background: rgba(255, 255, 255, 0.7); padding: 18px; border-radius: 12px; border: 1px solid rgba(226, 232, 240, 0.8);">
                     <div style="font-size: 32px;">2️⃣</div>
                     <b style="color: #0f172a; font-size: 16px;">Specialist Review</b>
-                    <p style="font-size: 13px; color: #64748b; margin-top: 6px;">MD General Medicine specialists analyze your clinical history daily from 4 PM - 6 PM.</p>
+                    <p style="font-size: 13px; color: #475569; margin-top: 6px;">MD General Medicine specialists analyze your clinical history daily from 4 PM - 6 PM.</p>
                 </div>
-                <div style="flex: 1; min-width: 220px; background: rgba(248, 250, 252, 0.9); padding: 18px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                <div style="flex: 1; min-width: 220px; background: rgba(255, 255, 255, 0.7); padding: 18px; border-radius: 12px; border: 1px solid rgba(226, 232, 240, 0.8);">
                     <div style="font-size: 32px;">3️⃣</div>
                     <b style="color: #0f172a; font-size: 16px;">Receive Guidance</b>
-                    <p style="font-size: 13px; color: #64748b; margin-top: 6px;">Get clear diagnosis validation, drug safety checks, or diet advice directly on WhatsApp.</p>
+                    <p style="font-size: 13px; color: #475569; margin-top: 6px;">Get clear diagnosis validation, drug safety checks, or diet advice directly on WhatsApp.</p>
                 </div>
             </div>
         </div>
     """, unsafe_allow_html=True)
 
-    # Interactive Quick Form
+    # Interactive Form
     st.subheader("📋 Direct Consultation Request Builder")
     col_q1, col_q2 = st.columns(2)
     with col_q1:
@@ -233,7 +245,7 @@ with tab1:
         st.markdown(f"""
             <div class="glass-card">
                 <h4 style="color: #0b3c5d; margin-top: 0; font-size: 18px;">🔬 Lab Report Review & Second Opinion</h4>
-                <p style="color: #475569; font-size: 14px;">Unsure about blood tests or scans? Get an independent, expert MD review on diagnosis accuracy and safety.</p>
+                <p style="color: #334155; font-size: 14px;">Unsure about blood tests or scans? Get an independent, expert MD review on diagnosis accuracy and safety.</p>
                 <p><b>Consultation Fee:</b> <span style="color: #ef4444; font-weight: bold;">{CONSULTATION_FEE}</span></p>
                 <a href="{get_whatsapp_url('Lab Report Review & Second Opinion')}" target="_blank" class="btn-wa">
                     💬 Book Second Opinion on WhatsApp
@@ -246,7 +258,7 @@ with tab1:
         st.markdown(f"""
             <div class="glass-card">
                 <h4 style="color: #0b3c5d; margin-top: 0; font-size: 18px;">💊 Medication & Side-Effect Safety Check</h4>
-                <p style="color: #475569; font-size: 14px;">Verify drug dosages, understand potential side effects, check long-term drug safety, or resolve medication doubts.</p>
+                <p style="color: #334155; font-size: 14px;">Verify drug dosages, understand potential side effects, check long-term drug safety, or resolve medication doubts.</p>
                 <p><b>Consultation Fee:</b> <span style="color: #ef4444; font-weight: bold;">{CONSULTATION_FEE}</span></p>
                 <a href="{get_whatsapp_url('Drug & Medication Review')}" target="_blank" class="btn-wa">
                     💬 Ask About Medicines
@@ -258,7 +270,7 @@ with tab1:
         st.markdown(f"""
             <div class="glass-card">
                 <h4 style="color: #0b3c5d; margin-top: 0; font-size: 18px;">🥗 Clinical Diet & Lifestyle Guidance</h4>
-                <p style="color: #475569; font-size: 14px;">Evidence-based dietary advice for managing Diabetes, Hypertension, Fatty Liver, Cholesterol, and Metabolic conditions.</p>
+                <p style="color: #334155; font-size: 14px;">Evidence-based dietary advice for managing Diabetes, Hypertension, Fatty Liver, Cholesterol, and Metabolic conditions.</p>
                 <p><b>Consultation Fee:</b> <span style="color: #ef4444; font-weight: bold;">{CONSULTATION_FEE}</span></p>
                 <a href="{get_whatsapp_url('Diet & Nutrition Guidance')}" target="_blank" class="btn-wa">
                     💬 Request Diet Guidance
@@ -271,7 +283,7 @@ with tab1:
         st.markdown(f"""
             <div class="glass-card">
                 <h4 style="color: #0b3c5d; margin-top: 0; font-size: 18px;">📈 Chronic Illness Tracker & Progression</h4>
-                <p style="color: #475569; font-size: 14px;">Regular health check-ins to monitor disease trends over time and implement preventive steps for long-term health.</p>
+                <p style="color: #334155; font-size: 14px;">Regular health check-ins to monitor disease trends over time and implement preventive steps for long-term health.</p>
                 <p><b>Consultation Fee:</b> <span style="color: #ef4444; font-weight: bold;">{CONSULTATION_FEE}</span></p>
                 <a href="{get_whatsapp_url('Disease Progression Check')}" target="_blank" class="btn-wa">
                     💬 Book Health Tracker
