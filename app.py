@@ -3,11 +3,17 @@ import sqlite3
 import pandas as pd
 from datetime import datetime
 
+# Page Configuration
+st.set_page_config(
+    page_title="N2 Care Teleclinic",
+    page_icon="🩺",
+    layout="wide"
+)
+
 # Initialize SQLite Database
 conn = sqlite3.connect('n2_teleclinic.db', check_same_thread=False)
 c = conn.cursor()
 
-# Create table for requested patient details
 c.execute('''
     CREATE TABLE IF NOT EXISTS patients (
         patient_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,11 +28,28 @@ c.execute('''
 ''')
 conn.commit()
 
-# Page Setup
-st.set_page_config(page_title="N2 Care Teleclinic", layout="wide")
-st.title("🏥 N2 Care Teleclinic - Patient Records System")
+# Header & Logo Section (HTML/CSS Styled)
+st.markdown("""
+    <div style="text-align: center; background-color: #0f4c81; padding: 20px; border-radius: 12px; margin-bottom: 25px; color: white;">
+        <svg width="80" height="80" viewBox="0 0 100 100" style="margin-bottom: 10px;">
+            <circle cx="50" cy="50" r="45" fill="#ffffff" />
+            <rect x="43" y="25" width="14" height="50" fill="#e63946" />
+            <rect x="25" y="43" width="50" height="14" fill="#e63946" />
+        </svg>
+        <h1 style="margin: 0; font-size: 38px; color: #ffffff; font-weight: 700;">N2 CARE TELECLINIC</h1>
+        <p style="font-size: 18px; font-style: italic; margin-top: 5px; color: #a8dadc;">"Need for the needs"</p>
+        <hr style="border: 0.5px solid #457b9d; margin: 15px 0;">
+        <div style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; font-size: 16px;">
+            <div>👨‍⚕️ <b>Dr. Vigneshwar</b> <br><small>MBBS, MD General Medicine</small></div>
+            <div>👩‍⚕️ <b>Dr. S. Malathi</b> <br><small>MBBS, MD General Medicine</small></div>
+        </div>
+        <p style="margin-top: 15px; font-size: 14px; background-color: #1d3557; display: inline-block; padding: 5px 15px; border-radius: 20px; color: #f1faee;">
+            ✨ Powered by Budding Young Doctors
+        </p>
+    </div>
+""", unsafe_allow_html=True)
 
-# Entry Form
+# Data Entry Form
 with st.form("patient_form", clear_on_submit=True):
     st.subheader("📝 New Patient Entry")
     
@@ -42,7 +65,7 @@ with st.form("patient_form", clear_on_submit=True):
         investigation = st.text_area("5. Investigation", height=80)
         treatment_history = st.text_area("6. Treatment History", height=80)
 
-    submit_button = st.form_submit_button("Save Record")
+    submit_button = st.form_submit_button("💾 Save Record")
     
     if submit_button:
         if not patient_name.strip():
@@ -54,9 +77,9 @@ with st.form("patient_form", clear_on_submit=True):
                 VALUES (?, ?, ?, ?, ?, ?, ?)
             ''', (current_time, patient_name, age, address, complaints, investigation, treatment_history))
             conn.commit()
-            st.success(f"Record successfully saved for {patient_name}.")
+            st.success(f"Record successfully saved for {patient_name}!")
 
-# Database View
+# Saved Records Section
 st.markdown("---")
 st.subheader("📋 Registered Patient Records")
 
@@ -80,7 +103,7 @@ st.dataframe(df, use_container_width=True)
 if not df.empty:
     csv_data = df.to_csv(index=False).encode('utf-8')
     st.download_button(
-        label="📥 Download Data (Excel / CSV)",
+        label="📥 Export All Records (Excel / CSV)",
         data=csv_data,
         file_name=f"N2_Care_Patients_{datetime.now().strftime('%Y%m%d')}.csv",
         mime="text/csv"
