@@ -60,16 +60,14 @@ def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# 3. Custom Warm Cultural Aesthetic Styling
+# 3. Custom CSS with Doctor Avatar Banner Styling
 st.markdown("""
 <style>
-    /* Warm Cream Background inspired by Indian Traditional Mockup */
     .stApp {
         background: linear-gradient(180deg, #fefae0 0%, #fffdf5 350px, #faf8ed 100%) !important;
         font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
     
-    /* Emergency Bar */
     .emergency-bar {
         display: flex;
         justify-content: space-between;
@@ -98,7 +96,52 @@ st.markdown("""
         box-shadow: 0 4px 10px rgba(188, 108, 37, 0.3);
     }
 
-    /* Traditional Gold-Border Card */
+    /* Hero Banner with Traditional Royal Arch Styling */
+    .hero-card {
+        background: linear-gradient(135deg, #1b2612 0%, #283618 60%, #3a4a20 100%) !important;
+        border: 3px solid #dda15e;
+        padding: 25px 20px;
+        border-radius: 20px;
+        color: #fefae0 !important;
+        text-align: center;
+        box-shadow: 0 12px 28px rgba(40, 54, 24, 0.3);
+        margin-bottom: 20px;
+    }
+    
+    /* Doctor Badges styled after Mockup Card */
+    .doc-badge-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-top: 15px;
+    }
+    
+    .doc-badge {
+        background: #fefae0;
+        border: 2px solid #dda15e;
+        border-radius: 16px;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        min-width: 280px;
+        text-align: left;
+    }
+
+    .doc-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #dda15e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        border: 2px solid #bc6c25;
+    }
+
     .warm-card {
         background: #ffffff !important;
         border: 2px solid #dda15e;
@@ -106,18 +149,6 @@ st.markdown("""
         border-radius: 16px;
         box-shadow: 0 8px 20px rgba(188, 108, 37, 0.08);
         height: 100%;
-    }
-    
-    /* Warm Header Banner */
-    .hero-card {
-        background: linear-gradient(135deg, #283618 0%, #606c38 100%) !important;
-        border: 2px solid #dda15e;
-        padding: 25px 20px;
-        border-radius: 18px;
-        color: #fefae0 !important;
-        text-align: center;
-        box-shadow: 0 12px 28px rgba(40, 54, 24, 0.25);
-        margin-bottom: 20px;
     }
     
     .btn-wa {
@@ -130,15 +161,6 @@ st.markdown("""
         display: inline-block;
         margin-top: 12px;
         box-shadow: 0 6px 15px rgba(37, 211, 102, 0.35);
-    }
-    
-    .badge-pill {
-        background: rgba(254, 250, 224, 0.15);
-        border: 1px solid rgba(221, 161, 94, 0.5);
-        padding: 10px 18px;
-        border-radius: 12px;
-        display: inline-block;
-        margin: 5px;
     }
     
     .inst-card {
@@ -159,7 +181,6 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
 
-    /* High-contrast dark typography */
     h1, h2, h3, h4 {
         color: #283618 !important;
         font-weight: 800 !important;
@@ -187,20 +208,30 @@ with col_l2:
             st.image(f, use_container_width=True)
             break
 
-# Hero Banner
+# Hero Banner with Doctor Profiles (Matching Mockup 116769_2.png)
 st.markdown("""
     <div class="hero-card">
-        <h1 style="color: #fefae0 !important; margin-bottom: 4px; font-size: 32px; font-weight: 800; letter-spacing: 0.5px;">N2 CARE TELECLINIC</h1>
+        <h1 style="color: #fefae0 !important; margin-bottom: 2px; font-size: 32px; font-weight: 800; letter-spacing: 0.5px;">N2 CARE TELECLINIC</h1>
         <p style="font-size: 17px; font-style: italic; color: #dda15e !important; font-weight: 600; margin-top: 0;">"Your Friendly Second Opinion"</p>
-        <p style="font-size: 13px; color: #fefae0 !important; margin-top: -6px;">One Care. Many Specialties. One Purpose.</p>
-        <div style="margin-top: 15px;">
-            <div class="badge-pill">
-                <span style="color: #fefae0 !important;">👨‍⚕️ <b>Dr. Vigneshwar</b> | MBBS, MD General Medicine</span><br>
-                <small style="color: #dda15e !important;">✓ TNMC Reg No: 159693</small>
+        <p style="font-size: 13px; color: #fefae0 !important; margin-top: -6px;">Our Care. Many Specialties. One Purpose.</p>
+        
+        <div class="doc-badge-container">
+            <div class="doc-badge">
+                <div class="doc-avatar">👨‍⚕️</div>
+                <div>
+                    <b style="color: #283618 !important; font-size: 15px;">Dr. Vigneshwar</b><br>
+                    <span style="font-size: 12px; color: #57534e !important;">MBBS, MD General Medicine</span><br>
+                    <small style="color: #bc6c25 !important; font-weight: bold;">✓ TNMC Reg No: 159693</small>
+                </div>
             </div>
-            <div class="badge-pill">
-                <span style="color: #fefae0 !important;">👩‍⚕️ <b>Dr. S. Malathi</b> | MBBS, MD General Medicine</span><br>
-                <small style="color: #dda15e !important;">✓ TNMC Verified Practitioner</small>
+            
+            <div class="doc-badge">
+                <div class="doc-avatar">👩‍⚕️</div>
+                <div>
+                    <b style="color: #283618 !important; font-size: 15px;">Dr. S. Malathi</b><br>
+                    <span style="font-size: 12px; color: #57534e !important;">MBBS, MD General Medicine</span><br>
+                    <small style="color: #bc6c25 !important; font-weight: bold;">✓ TNMC Verified Practitioner</small>
+                </div>
             </div>
         </div>
     </div>
