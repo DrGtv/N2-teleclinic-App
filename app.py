@@ -4,8 +4,6 @@ import pandas as pd
 from datetime import datetime
 import urllib.parse
 import os
-import base64
-import textwrap
 
 # 1. Page Configuration
 st.set_page_config(
@@ -14,30 +12,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Robust Logo Base64 Encoder (Prevents Broken Image Icons)
-def get_logo_html():
-    possible_files = ["logo.png", "logo.jpg", "logo.jpeg", "Logo.png", "116741.jpg", "116742.jpg", "116743.jpg"]
-    for file in possible_files:
-        if os.path.exists(file):
-            with open(file, "rb") as f:
-                encoded = base64.b64encode(f.read()).decode()
-                ext = file.split(".")[-1].lower()
-                if ext == "jpg":
-                    ext = "jpeg"
-                return f'<img src="data:image/{ext};base64,{encoded}" style="max-height: 110px; max-width: 90%; width: auto; background: #ffffff; padding: 10px 18px; border-radius: 14px; box-shadow: 0px 4px 15px rgba(0,0,0,0.25);">'
-    
-    # Fallback Medical SVG Emblem if no file is uploaded yet
-    return '''
-    <svg width="90" height="90" viewBox="0 0 100 100" style="background: white; border-radius: 50%; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-        <circle cx="50" cy="50" r="45" fill="#ffffff" />
-        <rect x="43" y="20" width="14" height="60" fill="#e63946" />
-        <rect x="20" y="43" width="60" height="14" fill="#e63946" />
-    </svg>
-    '''
-
-logo_html_element = get_logo_html()
-
-# Configuration & Clinic Settings
+# Configuration Variables
 CLINIC_PHONE = "919486872627"
 UPI_ID = "9486872627@upi"
 CONSULTATION_FEE = "₹100"
@@ -74,134 +49,110 @@ c.execute('''
 conn.commit()
 
 # Helper Functions
-def get_whatsapp_url(service_name):
-    msg = f"Hello N2 Care Teleclinic, I would like to consult for '{service_name}' (Fee: {CONSULTATION_FEE}). I am sending my reports/voice notes between {BOOKING_HOURS}."
+def get_whatsapp_url(service_name, custom_notes=""):
+    msg = f"Hello N2 Care Teleclinic, I would like to consult for '{service_name}' (Fee: {CONSULTATION_FEE})."
+    if custom_notes:
+        msg += f"\nDetails: {custom_notes}"
+    msg += f"\nI am sending my reports/voice notes between {BOOKING_HOURS}."
     return f"https://wa.me/{CLINIC_PHONE}?text={urllib.parse.quote(msg)}"
 
 def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# 3. CSS Stylesheet Injection (Clean Unindented)
+# 3. Clean CSS Button & Card Styles
 st.markdown("""
 <style>
-.header-card {
-    background: linear-gradient(135deg, #0b3c5d 0%, #1d5b84 100%);
-    padding: 25px;
-    border-radius: 16px;
-    color: white;
-    text-align: center;
-    box-shadow: 0 10px 25px rgba(11, 60, 93, 0.15);
-    margin-bottom: 25px;
-}
-.clinic-title {
-    font-size: 32px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    margin: 12px 0 2px 0;
-    color: #ffffff;
-}
-.clinic-tagline {
-    font-size: 18px;
-    font-style: italic;
-    color: #38bdf8;
-    margin-bottom: 12px;
-    font-weight: 600;
-}
-.doc-badge {
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(6px);
-    padding: 10px 18px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    display: inline-block;
-    margin: 6px;
-    text-align: left;
-}
-.tnmc-verified {
-    background-color: #0284c7;
-    color: white;
-    padding: 3px 8px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: bold;
-    display: inline-block;
-    margin-top: 4px;
-}
-.trust-pill {
-    background-color: #059669;
-    color: white;
-    padding: 8px 20px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 600;
-    display: inline-block;
-    margin-top: 15px;
-}
-.service-card {
-    border: 1px solid #e2e8f0;
-    padding: 22px;
-    border-radius: 12px;
-    background-color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    height: 100%;
-}
-.btn-wa {
-    background-color: #25D366;
-    color: white !important;
-    padding: 10px 20px;
-    font-weight: 700;
-    text-decoration: none;
-    border-radius: 8px;
-    display: inline-block;
-    margin-top: 10px;
-    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
-}
+    .service-card {
+        border: 1px solid #e2e8f0;
+        padding: 20px;
+        border-radius: 12px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        height: 100%;
+    }
+    .btn-wa {
+        background-color: #25D366;
+        color: white !important;
+        padding: 10px 20px;
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 8px;
+        display: inline-block;
+        margin-top: 10px;
+        box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+    }
+    .inst-card {
+        border-left: 4px solid #0284c7;
+        background: #f8fafc;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+        border-radius: 6px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Strict Zero-Indentation Header HTML to avoid Markdown code blocks
-header_raw_html = f"""
-<div class="header-card">
-<div>
-{logo_html_element}
-</div>
-<div class="clinic-title">N2 CARE TELECLINIC</div>
-<div class="clinic-tagline">"Your Friendly Second Opinion"</div>
-<p style="font-size: 14px; color: #e0f2fe; margin-top: -6px;">One Care. Many Specialties. One Purpose.</p>
-<div style="margin-top: 15px;">
-<div class="doc-badge">
-👨‍⚕️ <b>Dr. Vigneshwar</b> <br>
-<small style="color: #93c5fd;">MBBS, MD General Medicine</small><br>
-<span class="tnmc-verified">✓ TNMC Verified: Reg No 159693</span>
-</div>
-<div class="doc-badge">
-👩‍⚕️ <b>Dr. S. Malathi</b> <br>
-<small style="color: #93c5fd;">MBBS, MD General Medicine</small><br>
-<span class="tnmc-verified">✓ TNMC Verified Practitioner</span>
-</div>
-</div>
-<div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
-<span style="background-color: #ef4444; color: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px;">Fee: {CONSULTATION_FEE} Only</span>
-<span style="background-color: #0284c7; color: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px;">📩 Report Submission: {BOOKING_HOURS}</span>
-<span style="background-color: #10b981; color: white; padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px;">🩺 Doctor Review Window: {REVIEW_HOURS}</span>
-</div>
-<div class="trust-pill">
-🛡️ Tamil Nadu Medical Council (TNMC) Registered Doctors | 100% Confidential
-</div>
-</div>
-"""
+# 4. Header & Branding Section (Native Layout)
+logo_files = ["logo.png", "logo.jpg", "logo.jpeg", "Logo.png", "116741.jpg", "116741_2.jpg", "116742.jpg", "116743.jpg", "116744.jpg"]
+logo_found = False
 
-st.markdown(textwrap.dedent(header_raw_html), unsafe_allow_html=True)
+col_l1, col_l2, col_l3 = st.columns([1, 2, 1])
+with col_l2:
+    for f in logo_files:
+        if os.path.exists(f):
+            st.image(f, use_column_width=True)
+            logo_found = True
+            break
+    if not logo_found:
+        st.markdown("<h1 style='text-align: center; color: #0b3c5d;'>🏥 N2 CARE TELECLINIC</h1>", unsafe_allow_html=True)
 
-# 4. Navigation Tabs
-tab1, tab2, tab3 = st.tabs([
-    "🤝 Patient Portal & Booking ({})".format(CONSULTATION_FEE),
-    "🔒 Doctor Entry Dashboard",
-    "🔒 Patient Database & E-Prescription"
+st.markdown("""
+    <div style="text-align: center; margin-top: -10px; margin-bottom: 20px;">
+        <h2 style="color: #0b3c5d; margin-bottom: 2px;">N2 CARE TELECLINIC</h2>
+        <p style="font-size: 18px; font-style: italic; color: #0284c7; font-weight: 600; margin-top: 0;">"Your Friendly Second Opinion"</p>
+        <p style="font-size: 14px; color: #475569; margin-top: -8px;">One Care. Many Specialties. One Purpose.</p>
+    </div>
+""", unsafe_allow_html=True)
+
+# Doctor Verification Badges
+d_col1, d_col2 = st.columns(2)
+with d_col1:
+    st.markdown("""
+        <div style="background-color: #f0f9ff; border-left: 5px solid #0284c7; padding: 12px; border-radius: 8px;">
+            👨‍⚕️ <b>Dr. Vigneshwar</b><br>
+            <small style="color: #475569;">MBBS, MD General Medicine</small><br>
+            <span style="background-color: #0284c7; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold;">✓ TNMC Verified: Reg No 159693</span>
+        </div>
+    """, unsafe_allow_html=True)
+
+with d_col2:
+    st.markdown("""
+        <div style="background-color: #f0f9ff; border-left: 5px solid #0284c7; padding: 12px; border-radius: 8px;">
+            👩‍⚕️ <b>Dr. S. Malathi</b><br>
+            <small style="color: #475569;">MBBS, MD General Medicine</small><br>
+            <span style="background-color: #0284c7; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold;">✓ TNMC Verified Practitioner</span>
+        </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Operational Status Pills
+p_col1, p_col2, p_col3 = st.columns(3)
+p_col1.error(f"Fee: {CONSULTATION_FEE} Only")
+p_col2.info(f"📩 Report Submission: {BOOKING_HOURS}")
+p_col3.success(f"🩺 Doctor Review: {REVIEW_HOURS}")
+
+st.markdown("---")
+
+# 5. Application Navigation Tabs
+tab1, tab2, tab3, tab4 = st.tabs([
+    "🤝 Patient Portal & Booking",
+    "🌐 National Directory & Referral Hub",
+    "🔒 Doctor Dashboard",
+    "🔒 Database & E-Prescription"
 ])
 
-# TAB 1: Public Patient Portal
+# TAB 1: Patient Consultation Portal
 with tab1:
     st.markdown("""
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
@@ -210,7 +161,7 @@ with tab1:
                 <div style="flex: 1; min-width: 200px;">
                     <div style="font-size: 28px;">1️⃣</div>
                     <b>Send Reports</b>
-                    <p style="font-size: 13px; color: #64748b;">Share lab results, prescriptions, or voice notes via WhatsApp between 9 AM - 3 PM.</p>
+                    <p style="font-size: 13px; color: #64748b;">Share lab results, scan links, or voice notes via WhatsApp between 9 AM - 3 PM.</p>
                 </div>
                 <div style="flex: 1; min-width: 200px;">
                     <div style="font-size: 28px;">2️⃣</div>
@@ -226,8 +177,37 @@ with tab1:
         </div>
     """, unsafe_allow_html=True)
 
-    st.info("🎙️ **Can't type long text?** You can record a short WhatsApp voice message explaining your symptoms alongside your report photos!")
+    # Interactive Consultation Form
+    st.subheader("📋 Quick Consultation Request Builder")
+    col_q1, col_q2 = st.columns(2)
+    with col_q1:
+        query_type = st.selectbox("I need help with:", [
+            "Lab & Blood Report Review",
+            "CT / MRI Scan Second Opinion",
+            "Drug Side-Effects & Dosage Check",
+            "Diet & Nutrition Plan",
+            "Chronic Disease Progression Tracking"
+        ])
+    with col_q2:
+        report_link = st.text_input("Report / Google Drive Link (Optional):", placeholder="https://drive.google.com/...")
 
+    notes_input = st.text_input("Briefly describe your question/concern:", placeholder="e.g. Need second opinion on lab reports or current medication...")
+    
+    combined_query = f"Focus: {query_type}"
+    if report_link:
+        combined_query += f" | Report Link: {report_link}"
+    if notes_input:
+        combined_query += f" | Notes: {notes_input}"
+
+    st.markdown(f'''
+        <a href="{get_whatsapp_url(query_type, combined_query)}" target="_blank" class="btn-wa" style="font-size: 16px;">
+            💬 Send Consultation Request via WhatsApp (Fee: {CONSULTATION_FEE})
+        </a>
+    ''', unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # Service Modules
     col_a, col_b = st.columns(2)
 
     with col_a:
@@ -282,7 +262,7 @@ with tab1:
 
     st.markdown("---")
     
-    # Secure Payment Section
+    # UPI Payment Gateway
     st.subheader("💳 Instant ₹100 Payment Portal")
     pay_col1, pay_col2 = st.columns([1, 2])
     
@@ -301,8 +281,67 @@ with tab1:
             </div>
         """, unsafe_allow_html=True)
 
-# TAB 2: Internal Doctor Data Entry (PIN Protected)
+# TAB 2: National Directory & Tertiary Care Hub
 with tab2:
+    st.subheader("🌐 Premier National Institutes & Medical Referral Directory")
+    st.write("Explore premier healthcare institutions across India alongside **N2 Care Teleclinic** for tele-consultations, report validations, and tertiary care referrals:")
+
+    dir_col1, dir_col2 = st.columns(2)
+
+    with dir_col1:
+        st.markdown("""
+            <div class="inst-card">
+                <b>🩺 N2 Care Teleclinic</b> — <a href="https://n2-teleclinic-app-7wvhshbbbpegzz7hne4gr3.streamlit.app/" target="_blank">Official Teleconsultation Portal</a><br>
+                <small style="color: #475569;">₹100 Friendly Second Opinions | MD General Medicine Review</small>
+            </div>
+            <div class="inst-card">
+                <b>🏛️ AIIMS New Delhi</b> — <a href="https://www.aiims.edu/" target="_blank">Official Website</a><br>
+                <small style="color: #475569;">Apex Autonomous Medical Institute of National Importance</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 Apollo Hospitals</b> — <a href="https://www.apollohospitals.com/" target="_blank">Official Website</a><br>
+                <small style="color: #475569;">Multi-Specialty Super-Specialty Healthcare Network</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 Christian Medical College (CMC), Vellore</b> — <a href="https://admissions.cmcvellore.ac.in/" target="_blank">Official Website</a><br>
+                <small style="color: #475569;">Premier Tertiary Research & Medical Institution</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 Medanta – The Medicity, Gurugram</b> — <a href="https://www.medanta.org/" target="_blank">Official Website</a><br>
+                <small style="color: #475569;">Multi-Super Specialty Institute for Complex Care</small>
+            </div>
+            <div class="inst-card">
+                <b>🏛️ PGIMER, Chandigarh</b> — <a href="https://pgimer.edu.in/" target="_blank">Official Website</a><br>
+                <small style="color: #475569;">Postgraduate Institute of Medical Education & Research</small>
+            </div>
+        """, unsafe_allow_html=True)
+
+    with dir_col2:
+        st.markdown("""
+            <div class="inst-card">
+                <b>🔬 Tata Memorial Centre, Mumbai</b> — <a href="https://tmc.gov.in/" target="_blank">Official Website</a><br>
+                <small style="color: #475569;">National Comprehensive Cancer Care & Research Center</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 Kokilaben Dhirubhai Ambani Hospital</b> — <a href="https://www.kokilabenhospital.com/" target="_blank">Official Website</a><br>
+                <small style="color: #475569;">Advanced Multi-Specialty Tertiary Care Center, Mumbai</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 Fortis Healthcare</b> — <a href="https://www.fortishealthcare.com/" target="_blank">Official Website</a><br>
+                <small style="color: #475569;">Leading Integrated Healthcare Delivery Service Provider</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 Manipal Hospitals</b> — <a href="https://www.manipalhospitals.com/" target="_blank">Official Website</a><br>
+                <small style="color: #475569;">Pioneer Multi-Specialty Healthcare Network</small>
+            </div>
+            <div class="inst-card">
+                <b>🏥 Narayana Health</b> — <a href="https://www.narayanahealth.org/" target="_blank">Official Website</a><br>
+                <small style="color: #475569;">Affordable Cardiac & Multi-Specialty Care Network</small>
+            </div>
+        """, unsafe_allow_html=True)
+
+# TAB 3: Doctor Internal Clinical Entry (PIN Protected)
+with tab3:
     st.subheader("🔒 Doctor Internal Portal")
     pin_input_1 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin1")
     
@@ -381,8 +420,8 @@ with tab2:
     elif pin_input_1:
         st.error("Incorrect Passcode.")
 
-# TAB 3: Searchable Records & Printable Rx Sheet (PIN Protected)
-with tab3:
+# TAB 4: Searchable Patient Database & Printable Rx Pad (PIN Protected)
+with tab4:
     st.subheader("🔒 Doctor Internal Portal")
     pin_input_2 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin2")
 
@@ -415,7 +454,7 @@ with tab3:
                 <div style="border: 2px solid #0b3c5d; padding: 30px; border-radius: 12px; background-color: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                     <div style="text-align: center; border-bottom: 2px solid #0b3c5d; padding-bottom: 12px; margin-bottom: 20px;">
                         <h2 style="color: #0b3c5d; margin: 0; letter-spacing: 1px;">N2 CARE TELECLINIC</h2>
-                        <p style="margin: 3px 0; font-style: italic; font-weight: 700; color: #38bdf8;">"Your Friendly Second Opinion"</p>
+                        <p style="margin: 3px 0; font-style: italic; font-weight: 700; color: #0284c7;">"Your Friendly Second Opinion"</p>
                         <small style="color: #475569;"><b>Dr. Vigneshwar</b>, MBBS, MD (TNMC Reg No 159693) | <b>Dr. S. Malathi</b>, MBBS, MD</small><br>
                         <small style="color: #64748b;">WhatsApp: +91 94868 72627 | UPI: 9486872627@upi</small>
                     </div>
