@@ -63,6 +63,9 @@ def get_upi_qr_url():
 # 3. Clean CSS Styles
 st.markdown("""
 <style>
+.stApp {
+        background: linear-gradient(180deg, #f0f9ff 0%, #ffffff 100%);
+    }
     .service-card {
         border: 1px solid #e2e8f0;
         padding: 20px;
