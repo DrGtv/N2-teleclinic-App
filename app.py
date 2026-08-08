@@ -48,7 +48,7 @@ c.execute('''
 ''')
 conn.commit()
 
-# Helper Function: Structured WhatsApp Form Link
+# Helper Functions
 def get_detailed_whatsapp_url(name, age, gender, city, service_name, notes, report_link):
     msg = f"🏥 *N2 CARE TELECLINIC - CONSULTATION REQUEST*\n"
     msg += f"━━━━━━━━━━━━━━━━━━━━━━\n"
@@ -128,6 +128,41 @@ st.markdown("""
         text-align: center;
     }
 
+    /* 🌟 Doctor Profile Cards Styling 🌟 */
+    .doc-card-border {
+        background: linear-gradient(145deg, #ffffff 0%, #fffbeb 100%) !important;
+        border: 2px solid #dda15e !important;
+        border-radius: 18px !important;
+        padding: 16px !important;
+        box-shadow: 0 8px 20px rgba(188, 108, 37, 0.1) !important;
+        height: 100%;
+    }
+
+    .doc-name {
+        color: #0b3c5d !important;
+        font-size: 18px !important;
+        font-weight: 800 !important;
+        margin: 4px 0 2px 0 !important;
+    }
+
+    .doc-qual {
+        color: #475569 !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        margin: 0 0 8px 0 !important;
+    }
+
+    .doc-badge-pill {
+        background: #e0f2fe;
+        color: #0284c7 !important;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 800;
+        display: inline-block;
+        border: 1px solid #bae6fd;
+    }
+
     .inst-card {
         border-left: 5px solid #283618;
         background: #ffffff !important;
@@ -137,22 +172,6 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0,0,0,0.04);
     }
 
-    .testimonial-box {
-        background: #ffffff;
-        border-left: 4px solid #dda15e;
-        padding: 15px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    }
-
-    h1, h2, h3, h4 {
-        color: #0b3c5d !important;
-        font-weight: 800 !important;
-    }
-    p, span, li {
-        color: #1e293b !important;
-    }
     label {
         color: #0b3c5d !important;
         font-weight: 700 !important;
@@ -174,6 +193,57 @@ for b in hero_banner_files:
     if os.path.exists(b):
         st.image(b, use_container_width=True)
         break
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# 🌟 NEW: Doctor Avatars Render Section 🌟
+doc_col1, doc_col2 = st.columns(2)
+
+with doc_col1:
+    st.markdown('<div class="doc-card-border">', unsafe_allow_html=True)
+    a_col1, a_col2 = st.columns([1, 2.2])
+    with a_col1:
+        v_img_files = ["doc_vigneshwar.png", "116810.png", "doc_vigneshwar.jpg"]
+        v_found = False
+        for img in v_img_files:
+            if os.path.exists(img):
+                st.image(img, use_container_width=True)
+                v_found = True
+                break
+        if not v_found:
+            st.markdown('<div style="font-size: 50px; text-align: center;">👨‍⚕️</div>', unsafe_allow_html=True)
+    with a_col2:
+        st.markdown("""
+            <div>
+                <p class="doc-name">Dr. Vigneshwar</p>
+                <p class="doc-qual">MBBS, MD General Medicine</p>
+                <div class="doc-badge-pill">✓ TNMC Reg No: 159693</div>
+            </div>
+        """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+with doc_col2:
+    st.markdown('<div class="doc-card-border">', unsafe_allow_html=True)
+    m_col1, m_col2 = st.columns([1, 2.2])
+    with m_col1:
+        m_img_files = ["doc_malathi.png", "116809.png", "doc_malathi.jpg"]
+        m_found = False
+        for img in m_img_files:
+            if os.path.exists(img):
+                st.image(img, use_container_width=True)
+                m_found = True
+                break
+        if not m_found:
+            st.markdown('<div style="font-size: 50px; text-align: center;">👩‍⚕️</div>', unsafe_allow_html=True)
+    with m_col2:
+        st.markdown("""
+            <div>
+                <p class="doc-name">Dr. S. Malathi</p>
+                <p class="doc-qual">MBBS, MD General Medicine</p>
+                <div class="doc-badge-pill">✓ TNMC Verified Practitioner</div>
+            </div>
+        """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
@@ -219,7 +289,7 @@ with tab1:
         </div>
     """, unsafe_allow_html=True)
 
-    # 🌟 NEW: Complete Patient Registration Form Builder 🌟
+    # Patient Registration Form
     st.markdown("""
         <div style="background: #ffffff; border: 2px solid #0b3c5d; padding: 25px; border-radius: 16px; box-shadow: 0 8px 24px rgba(11, 60, 93, 0.08);">
             <h3 style="color: #0b3c5d !important; margin-top: 0; font-size: 22px;">📋 Patient Details & Consultation Form</h3>
@@ -249,7 +319,6 @@ with tab1:
     p_notes = st.text_area("6. Symptoms or Specific Clinical Questions:", placeholder="e.g. Want to check FBS, PPBS, and HbA1c values. Currently taking Metformin 500mg...")
     p_link = st.text_input("7. Google Drive / Scan Report Link (Optional):", placeholder="https://drive.google.com/...")
 
-    # Dynamic WhatsApp Link Generation
     wa_custom_url = get_detailed_whatsapp_url(p_name, p_age, p_gender, p_city, p_service, p_notes, p_link)
 
     st.markdown(f'''
@@ -313,19 +382,16 @@ with tab2:
 
 # TAB 3: Directory
 with tab3:
-    st.subheader("🌐 Regional & National Medical Directory")
-    st.write("Explore major healthcare institutions alongside **N2 Care Teleclinic**:")
+    st.subheader("🌐 Regional Directory")
 
 # TAB 4: Doctor Entry
 with tab4:
     st.subheader("🔒 Doctor Internal Portal")
     pin_input_1 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin1")
-    if pin_input_1 == DOCTOR_PIN:
-        st.success("Authenticated Successfully.")
 
 # TAB 5: Database
 with tab5:
-    st.subheader("🔒 Patient Records & E-Prescription")
+    st.subheader("🔒 Database & E-Prescription")
     pin_input_2 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin2")
     if pin_input_2 == DOCTOR_PIN:
         st.success("Authenticated Successfully.")
