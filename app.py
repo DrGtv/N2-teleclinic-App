@@ -18,7 +18,12 @@ UPI_ID = "9486872627@upi"
 CONSULTATION_FEE = "₹100"
 BOOKING_HOURS = "9:00 AM – 3:00 PM"
 REVIEW_HOURS = "4:00 PM – 6:00 PM (Daily)"
-DOCTOR_PIN = "1234"
+
+# 🔑 Separate Doctor PINs
+DOCTOR_PINS = {
+    "1596": "Dr. Vigneshwar",
+    "2026": "Dr. S. Malathi"
+}
 
 # 2. Database Initialization
 conn = sqlite3.connect('n2_teleclinic.db', check_same_thread=False)
@@ -128,7 +133,6 @@ st.markdown("""
         text-align: center;
     }
 
-    /* 🌟 Doctor Profile Cards Styling 🌟 */
     .doc-card-border {
         background: linear-gradient(145deg, #ffffff 0%, #fffbeb 100%) !important;
         border: 2px solid #dda15e !important;
@@ -196,7 +200,7 @@ for b in hero_banner_files:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 🌟 NEW: Doctor Avatars Render Section 🌟
+# Doctor Avatars Section
 doc_col1, doc_col2 = st.columns(2)
 
 with doc_col1:
@@ -384,16 +388,153 @@ with tab2:
 with tab3:
     st.subheader("🌐 Regional Directory")
 
-# TAB 4: Doctor Entry
+# TAB 4: Doctor Internal Portal
 with tab4:
     st.subheader("🔒 Doctor Internal Portal")
     pin_input_1 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin1")
+    
+    if pin_input_1 in DOCTOR_PINS:
+        st.success(f"Welcome, {DOCTOR_PINS[pin_input_1]}! Authenticated Successfully.")
+        st.subheader("📝 New Patient Registration & Clinical Notes")
+        
+        with st.form("clinical_entry_form", clear_on_submit=True):
+            col1, col2 = st.columns(2)
 
-# TAB 5: Database
+            with col1:
+                patient_name = st.text_input("1. Patient Name *")
+                age = st.number_input("2. Age", min_value=0, max_value=120, value=25)
+                gender = st.selectbox("3. Gender", ["Male", "Female", "Other"])
+                phone = st.text_input("4. Contact Number")
+                address = st.text_area("5. Address", height=80)
+
+            with col2:
+                consultation_type = st.selectbox("6. Consultation Focus", [
+                    "Second Opinion (Report Review)",
+                    "Drug / Medication Clarification",
+                    "Diet & Nutrition Planning",
+                    "Disease Progression Tracker",
+                    "General Medical Consultation"
+                ])
+                preferred_slot = st.selectbox("7. Review Time Slot", [
+                    "4:00 PM - 4:30 PM",
+                    "4:30 PM - 5:00 PM",
+                    "5:00 PM - 5:30 PM",
+                    "5:30 PM - 6:00 PM"
+                ])
+                followup_date = st.date_input("8. Follow-Up Date")
+                
+                st.markdown("<b>9. Patient Vitals:</b>", unsafe_allow_html=True)
+                v_col1, v_col2, v_col3, v_col4 = st.columns(4)
+                bp = v_col1.text_input("BP", placeholder="120/80")
+                pulse = v_col2.text_input("Pulse", placeholder="72")
+                spo2 = v_col3.text_input("SpO2 %", placeholder="98%")
+                temp = v_col4.text_input("Temp", placeholder="98.6 F")
+
+            st.markdown("---")
+            col_c1, col_c2 = st.columns(2)
+            with col_c1:
+                complaints = st.text_area("10. Chief Complaints / Symptoms", height=100)
+                investigation = st.text_area("11. Lab Reports & Scans Review", height=100)
+            with col_c2:
+                treatment_history = st.text_area("12. Clinical Advice / Notes", height=100)
+                prescription_details = st.text_area(
+                    "13. Digital E-Prescription (Drug | Dosage | Duration | Instruction)", 
+                    placeholder="1. Tab Paracetamol 650mg | 1-0-1 | 5 days | After Food\n2. Tab Pantoprazole 40mg | 1-0-0 | 7 days | Before Food",
+                    height=100
+                )
+
+            submit_btn = st.form_submit_button("💾 Save Patient Clinical Record")
+
+            if submit_btn:
+                if not patient_name.strip():
+                    st.error("Patient Name is required!")
+                else:
+                    entry_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    c.execute('''
+                        INSERT INTO patients (
+                            entry_date, patient_name, age, gender, phone, address, 
+                            bp, pulse, spo2, temp, complaints, investigation, 
+                            treatment_history, prescription_details, consultation_type, 
+                            preferred_slot, followup_date
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ''', (
+                        entry_time, patient_name, age, gender, phone, address,
+                        bp, pulse, spo2, temp, complaints, investigation,
+                        treatment_history, prescription_details, consultation_type,
+                        preferred_slot, str(followup_date)
+                    ))
+                    conn.commit()
+                    st.success(f"Record successfully saved for {patient_name}!")
+    elif pin_input_1:
+        st.error("Incorrect Passcode.")
+
+# TAB 5: Searchable Database & Rx Pad
 with tab5:
-    st.subheader("🔒 Database & E-Prescription")
+    st.subheader("🔒 Doctor Internal Portal")
     pin_input_2 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin2")
-    if pin_input_2 == DOCTOR_PIN:
-        st.success("Authenticated Successfully.")
+
+    if pin_input_2 in DOCTOR_PINS:
+        st.success(f"Welcome, {DOCTOR_PINS[pin_input_2]}! Authenticated Successfully.")
+        st.subheader("📋 Registered Patient Records & Printable E-Prescription")
+
         df = pd.read_sql_query("SELECT * FROM patients ORDER BY patient_id DESC", conn)
-        st.dataframe(df, use_container_width=True)
+
+        if not df.empty:
+            search_query = st.text_input("🔍 Search Patients by Name or Phone Number:")
+            
+            if search_query:
+                df_filtered = df[
+                    df['patient_name'].str.contains(search_query, case=False, na=False) |
+                    df['phone'].str.contains(search_query, case=False, na=False)
+                ]
+            else:
+                df_filtered = df
+
+            st.dataframe(df_filtered, use_container_width=True)
+
+            st.markdown("---")
+            st.subheader("📄 Formal Clinical Summary & E-Prescription Pad")
+            selected_id = st.selectbox("Select Patient ID to view Rx Pad:", df_filtered['patient_id'].tolist())
+            
+            patient_row = df_filtered[df_filtered['patient_id'] == selected_id].iloc[0]
+
+            st.markdown(f"""
+                <div style="border: 2px solid #0b3c5d; padding: 30px; border-radius: 12px; background-color: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                    <div style="text-align: center; border-bottom: 2px solid #0b3c5d; padding-bottom: 12px; margin-bottom: 20px;">
+                        <h2 style="color: #0b3c5d !important; margin: 0; letter-spacing: 1px;">N2 CARE TELECLINIC</h2>
+                        <p style="margin: 3px 0; font-style: italic; font-weight: 700; color: #283618 !important;">"Your Friendly Second Opinion"</p>
+                        <small style="color: #1e293b !important;"><b>Dr. Vigneshwar</b>, MBBS, MD (TNMC Reg No 159693) | <b>Dr. S. Malathi</b>, MBBS, MD</small><br>
+                        <small style="color: #57534e !important;">WhatsApp: +91 94868 72627 | UPI: 9486872627@upi</small>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 14px;">
+                        <div><b>Patient ID:</b> N2-{patient_row['patient_id']}</div>
+                        <div><b>Date:</b> {patient_row['entry_date']}</div>
+                    </div>
+                    <hr style="border: 0.5px solid #dda15e;">
+                    <p style="font-size: 14px;"><b>Patient Name:</b> {patient_row['patient_name']} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Age/Gender:</b> {patient_row['age']} yrs / {patient_row['gender']} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Phone:</b> {patient_row['phone']}</p>
+                    <p style="font-size: 14px;"><b>Consultation Focus:</b> {patient_row['consultation_type']} &nbsp;&nbsp;|&nbsp;&nbsp; <b>Review Slot:</b> {patient_row['preferred_slot']}</p>
+                    <p style="font-size: 14px;"><b>Vitals:</b> BP: {patient_row['bp']} | Pulse: {patient_row['pulse']} | SpO2: {patient_row['spo2']} | Temp: {patient_row['temp']}</p>
+                    <hr style="border: 0.5px solid #dda15e;">
+                    <p><b>Chief Complaints:</b><br>{patient_row['complaints']}</p>
+                    <p><b>Investigations / Scans Review:</b><br>{patient_row['investigation']}</p>
+                    <p><b>Clinical Advice & Notes:</b><br>{patient_row['treatment_history']}</p>
+                    <hr style="border: 0.5px solid #dda15e;">
+                    <h4 style="color: #ef4444 !important; margin-bottom: 5px;">💊 Rx (Prescription):</h4>
+                    <p style="background-color: #fffbeb; padding: 15px; border-radius: 8px; font-family: monospace; white-space: pre-wrap; border: 1px solid #dda15e;">{patient_row['prescription_details']}</p>
+                    <hr style="border: 0.5px solid #dda15e;">
+                    <p style="text-align: right; font-size: 14px;"><b>Next Recommended Follow-Up Date:</b> {patient_row['followup_date']}</p>
+                </div>
+            """, unsafe_allow_html=True)
+
+            st.markdown("<br>", unsafe_allow_html=True)
+            csv_data = df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📥 Export Full Database (CSV)",
+                data=csv_data,
+                file_name=f"N2_Care_Patients_{datetime.now().strftime('%Y%m%d')}.csv",
+                mime="text/csv"
+            )
+        else:
+            st.info("No patient records registered yet.")
+    elif pin_input_2:
+        st.error("Incorrect Passcode.")
