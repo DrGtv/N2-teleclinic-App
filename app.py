@@ -25,9 +25,12 @@ DOCTOR_PINS = {
     "2026": "Dr. S. Malathi"
 }
 
-# Session State for Language & Navigation
+# Session State Initializations
 if 'app_language' not in st.session_state:
     st.session_state.app_language = None
+
+if 'selected_consultation_mode' not in st.session_state:
+    st.session_state.selected_consultation_mode = "Fresh Teleconsultation"
 
 # 2. Database Initialization
 conn = sqlite3.connect('n2_teleclinic.db', check_same_thread=False)
@@ -96,7 +99,7 @@ def get_upi_qr_url():
     upi_payload = f"upi://pay?pa={UPI_ID}&pn=N2%20Care%20Teleclinic&am=100&cu=INR"
     return f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={urllib.parse.quote(upi_payload)}"
 
-# 3. Custom Styling
+# 3. Custom CSS Styling
 st.markdown("""
 <style>
     .stApp {
@@ -154,12 +157,23 @@ st.markdown("""
         text-align: center;
     }
 
-    .doc-card-border {
-        background: linear-gradient(145deg, #ffffff 0%, #fffbeb 100%) !important;
+    .doc-avatar-card {
+        background: #ffffff !important;
         border: 2px solid #dda15e !important;
         border-radius: 18px !important;
-        padding: 16px !important;
-        box-shadow: 0 8px 20px rgba(188, 108, 37, 0.1) !important;
+        padding: 15px !important;
+        text-align: center;
+        box-shadow: 0 6px 18px rgba(188, 108, 37, 0.1) !important;
+        height: 100%;
+    }
+
+    .doc-avatar-card-selected {
+        background: #fefae0 !important;
+        border: 3px solid #0b3c5d !important;
+        border-radius: 18px !important;
+        padding: 15px !important;
+        text-align: center;
+        box-shadow: 0 8px 22px rgba(11, 60, 93, 0.25) !important;
         height: 100%;
     }
 
@@ -190,11 +204,10 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 🌟 SCREEN 1: WELCOME LANDING PAGE (If language is not yet selected)
+# 🌟 SCREEN 1: WELCOME LANDING PAGE (Language Choice)
 # -----------------------------------------------------------------------------
 if st.session_state.app_language is None:
     
-    # Urgent Emergency Bar
     st.markdown("""
         <div class="emergency-bar">
             <span class="emergency-text">🚨 Urgent Clinical Helpline: +91 94868 72627</span>
@@ -202,7 +215,6 @@ if st.session_state.app_language is None:
         </div>
     """, unsafe_allow_html=True)
 
-    # Welcome Poster Rendering
     poster_files = ["welcome_poster.png", "117482.png", "welcome_poster.jpg"]
     poster_found = False
     for pf in poster_files:
@@ -222,14 +234,13 @@ if st.session_state.app_language is None:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Language Choice Selector
     st.markdown("""
         <div class="welcome-lang-box">
             <h3 style="color: #0b3c5d !important; margin-top: 0; font-size: 24px; font-weight: 800;">
                 🌐 Choose Your Language / உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்
             </h3>
             <p style="color: #57534e; font-size: 14px; margin-bottom: 20px;">
-                Please select your preferred language to proceed to the consultation portal / தொடர உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்:
+                Please select your preferred language to proceed / தொடர உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்:
             </p>
         </div>
     """, unsafe_allow_html=True)
@@ -251,7 +262,6 @@ if st.session_state.app_language is None:
 else:
     selected_lang = st.session_state.app_language
 
-    # Top Emergency Bar + Language Switcher
     top_col1, top_col2 = st.columns([3, 1])
     with top_col1:
         st.markdown("""
@@ -267,7 +277,7 @@ else:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Dynamic Poster per language selection
+    # Dynamic Poster Display
     if selected_lang == "தமிழ் (Tamil)":
         if os.path.exists("poster_tamil.png"):
             st.image("poster_tamil.png", use_container_width=True)
@@ -318,18 +328,101 @@ else:
 
     # TAB 1: Patient Consultation Portal
     with tab1:
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # 🌟 DOCTOR AVATAR TOGGLE SELECTOR 🌟
         if selected_lang == "தமிழ் (Tamil)":
-            st.subheader("ஆலோசனை வகையைத் தேர்ந்தெடுக்கவும்:")
-            consultation_mode = st.radio(
-                "வகை:",
-                ["🟢 1. புதிய மருத்துவ ஆலோசனை (Fresh Teleconsultation)", 
-                 "🔵 2. இரண்டாம் கட்ட ஆலோசனை (Second Opinion)"],
-                horizontal=True
-            )
+            st.subheader("ஆலோசனை வகையைத் தேர்ந்தெடுக்கவும் (Choose Consultation Mode):")
+        else:
+            st.subheader("Select Consultation Mode:")
 
-            st.markdown("""
+        doc_card1, doc_card2 = st.columns(2)
+
+        # Avatar 1: Dr. Vigneshwar (Fresh Teleconsultation)
+        with doc_card1:
+            is_fresh = st.session_state.selected_consultation_mode == "Fresh Teleconsultation"
+            card_class = "doc-avatar-card-selected" if is_fresh else "doc-avatar-card"
+            
+            st.markdown(f'<div class="{card_class}">', unsafe_allow_html=True)
+            v_img_files = ["doc_vigneshwar.png", "116810.png", "doc_vigneshwar.jpg"]
+            v_found = False
+            for img in v_img_files:
+                if os.path.exists(img):
+                    st.image(img, width=120)
+                    v_found = True
+                    break
+            if not v_found:
+                st.markdown('<div style="font-size: 55px;">👨‍⚕️</div>', unsafe_allow_html=True)
+
+            if selected_lang == "தமிழ் (Tamil)":
+                st.markdown("""
+                    <h4 style="color:#0b3c5d; margin:5px 0 2px 0;">Dr. Vigneshwar</h4>
+                    <p style="font-size:12px; color:#475569; margin-bottom:8px;">MBBS, MD General Medicine (TNMC 159693)</p>
+                    <b style="color:#059669; font-size:15px;">🟢 1. புதிய மருத்துவ ஆலோசனை</b>
+                    <p style="font-size:12px; color:#57534e; margin-top:4px;">புதிய அறிகுறிகள், பொதுவான உடல்நலக் கேள்விகள் மற்றும் நேரடி வழிகாட்டுதலுக்கு.</p>
+                """, unsafe_allow_html=True)
+                if st.button("இது தேவை (Select Fresh Consult)", key="btn_fresh", type="primary" if is_fresh else "secondary"):
+                    st.session_state.selected_consultation_mode = "Fresh Teleconsultation"
+                    st.rerun()
+            else:
+                st.markdown("""
+                    <h4 style="color:#0b3c5d; margin:5px 0 2px 0;">Dr. Vigneshwar</h4>
+                    <p style="font-size:12px; color:#475569; margin-bottom:8px;">MBBS, MD General Medicine (TNMC 159693)</p>
+                    <b style="color:#059669; font-size:15px;">🟢 1. Fresh Teleconsultation</b>
+                    <p style="font-size:12px; color:#57534e; margin-top:4px;">For new symptoms, general health queries, and direct doctor guidance.</p>
+                """, unsafe_allow_html=True)
+                if st.button("Select Fresh Teleconsultation", key="btn_fresh", type="primary" if is_fresh else "secondary"):
+                    st.session_state.selected_consultation_mode = "Fresh Teleconsultation"
+                    st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        # Avatar 2: Dr. S. Malathi (Second Opinion)
+        with doc_card2:
+            is_second = st.session_state.selected_consultation_mode == "Second Opinion"
+            card_class = "doc-avatar-card-selected" if is_second else "doc-avatar-card"
+            
+            st.markdown(f'<div class="{card_class}">', unsafe_allow_html=True)
+            m_img_files = ["doc_malathi.png", "116809.png", "doc_malathi.jpg"]
+            m_found = False
+            for img in m_img_files:
+                if os.path.exists(img):
+                    st.image(img, width=120)
+                    m_found = True
+                    break
+            if not m_found:
+                st.markdown('<div style="font-size: 55px;">👩‍⚕️</div>', unsafe_allow_html=True)
+
+            if selected_lang == "தமிழ் (Tamil)":
+                st.markdown("""
+                    <h4 style="color:#0b3c5d; margin:5px 0 2px 0;">Dr. S. Malathi</h4>
+                    <p style="font-size:12px; color:#475569; margin-bottom:8px;">MBBS, MD General Medicine</p>
+                    <b style="color:#0284c7; font-size:15px;">🔵 2. இரண்டாம் கட்ட ஆலோசனை</b>
+                    <p style="font-size:12px; color:#57534e; margin-top:4px;">இரத்தப் பரிசோதனை, ஸ்கேன் ரிப்போர்ட் மற்றும் மருந்துப் பாதுகாப்பு ஆய்வுக்கு.</p>
+                """, unsafe_allow_html=True)
+                if st.button("இது தேவை (Select Second Opinion)", key="btn_second", type="primary" if is_second else "secondary"):
+                    st.session_state.selected_consultation_mode = "Second Opinion"
+                    st.rerun()
+            else:
+                st.markdown("""
+                    <h4 style="color:#0b3c5d; margin:5px 0 2px 0;">Dr. S. Malathi</h4>
+                    <p style="font-size:12px; color:#475569; margin-bottom:8px;">MBBS, MD General Medicine</p>
+                    <b style="color:#0284c7; font-size:15px;">🔵 2. Second Opinion</b>
+                    <p style="font-size:12px; color:#57534e; margin-top:4px;">For blood test reviews, scan report evaluations, and drug safety checks.</p>
+                """, unsafe_allow_html=True)
+                if st.button("Select Second Opinion", key="btn_second", type="primary" if is_second else "secondary"):
+                    st.session_state.selected_consultation_mode = "Second Opinion"
+                    st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # Form Section
+        consultation_mode = st.session_state.selected_consultation_mode
+
+        if selected_lang == "தமிழ் (Tamil)":
+            st.markdown(f"""
                 <div style="background: #ffffff; border: 2px solid #0b3c5d; padding: 25px; border-radius: 16px;">
-                    <h3 style="color: #0b3c5d !important; margin-top: 0;">📋 நோயாளி விவரங்கள் படிவம்</h3>
+                    <h3 style="color: #0b3c5d !important; margin-top: 0;">📋 நோயாளி விவரங்கள் படிவம் ({consultation_mode})</h3>
                     <p style="font-size: 13px; color: #57534e;">உங்கள் விவரங்களை கீழே நிரப்பவும். இவை தானாகவே வாட்ஸ்அப் செய்தியாக மாறும்.</p>
             """, unsafe_allow_html=True)
 
@@ -370,17 +463,9 @@ else:
             ''', unsafe_allow_html=True)
 
         else:
-            st.subheader("Choose Your Consultation Mode:")
-            consultation_mode = st.radio(
-                "Select Option:",
-                ["🟢 1. Fresh Teleconsultation (For new symptoms & general checkups)", 
-                 "🔵 2. Second Opinion (For report reviews, scan evaluations & drug safety)"],
-                horizontal=True
-            )
-
-            st.markdown("""
+            st.markdown(f"""
                 <div style="background: #ffffff; border: 2px solid #0b3c5d; padding: 25px; border-radius: 16px;">
-                    <h3 style="color: #0b3c5d !important; margin-top: 0; font-size: 22px;">📋 Patient Details & Consultation Form</h3>
+                    <h3 style="color: #0b3c5d !important; margin-top: 0; font-size: 22px;">📋 Patient Details & Consultation Form ({consultation_mode})</h3>
                     <p style="font-size: 13px; color: #57534e;">Please fill out your details below. These will be formatted and pre-filled into WhatsApp automatically.</p>
             """, unsafe_allow_html=True)
 
