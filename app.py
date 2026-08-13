@@ -4,6 +4,13 @@ import pandas as pd
 from datetime import datetime
 import urllib.parse
 import os
+import io
+
+# ReportLab Libraries for PDF Generation
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 
 # 1. Page Configuration
 st.set_page_config(
@@ -55,13 +62,110 @@ c.execute('''
         prescription_details TEXT,
         consultation_type TEXT,
         preferred_slot TEXT,
-        followup_date TEXT
+        followup_date TEXT,
+        abha_id TEXT
     )
 ''')
 conn.commit()
 
-# Helper Function: Structured WhatsApp Form Link
-def get_detailed_whatsapp_url(mode, name, age, gender, city, service_name, notes, report_link, lang):
+# Helper Function: Generate NMC & ABDM Compliance PDF
+def generate_nmc_compliance_pdf():
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
+    story = []
+    styles = getSampleStyleSheet()
+
+    title_style = ParagraphStyle(
+        'DocTitle',
+        parent=styles['Heading1'],
+        fontName='Helvetica-Bold',
+        fontSize=20,
+        textColor=colors.HexColor('#0b3c5d'),
+        alignment=1,
+        spaceAfter=4
+    )
+    subtitle_style = ParagraphStyle(
+        'DocSubTitle',
+        parent=styles['Normal'],
+        fontName='Helvetica-Oblique',
+        fontSize=11,
+        textColor=colors.HexColor('#bc6c25'),
+        alignment=1,
+        spaceAfter=12
+    )
+    section_heading = ParagraphStyle(
+        'SectionHeading',
+        parent=styles['Heading2'],
+        fontName='Helvetica-Bold',
+        fontSize=13,
+        textColor=colors.HexColor('#0b3c5d'),
+        spaceBefore=10,
+        spaceAfter=6
+    )
+    body_text = ParagraphStyle(
+        'BodyTextCustom',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=9.5,
+        textColor=colors.HexColor('#334155'),
+        spaceAfter=6,
+        leading=13
+    )
+
+    story.append(Paragraph("N2 CARE TELECLINIC", title_style))
+    story.append(Paragraph('"Your Friendly Second Opinion" &bull; Legal, NMC & ABDM Compliance Roadmap', subtitle_style))
+    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor('#dda15e'), spaceAfter=12))
+
+    intro_p = ("This document outlines the operational and legal guidelines derived from the National Medical Commission "
+               "(NMC) Telemedicine Practice Guidelines, NHSRC Framework, and Ayushman Bharat Digital Mission (ABDM) "
+               "to ensure 100% compliance for N2 Care Teleclinic.")
+    story.append(Paragraph(intro_p, body_text))
+    story.append(Spacer(1, 8))
+
+    story.append(Paragraph("1. Mandatory Identity & Credential Display", section_heading))
+    p1 = ("• <b>Doctor Identification:</b> Every teleconsultation, digital message, and prescription MUST display the doctor's full name, MBBS/MD qualifications, State Medical Council Registration Number (e.g., TNMC Reg No: 159693), and official clinic address.<br/>"
+          "• <b>Patient Verification & ABHA Linking:</b> Mandatory collection of Name, Age, Gender, Location, Contact Number, and optional ABHA ID linking.<br/>"
+          "• <b>Minor Protocol (<18 yrs):</b> Consultations for minors proceed ONLY when accompanied by an adult guardian whose identity is recorded.")
+    story.append(Paragraph(p1, body_text))
+
+    story.append(Paragraph("2. Patient Consent & Ethical Protocols", section_heading))
+    p2 = ("• <b>Implied Consent:</b> Consent is implied when the patient voluntarily initiates a consultation via the clinic portal or WhatsApp.<br/>"
+          "• <b>Explicit Consent:</b> Required if recording audio/video or initiating follow-up outreach. Explicit consent must be documented in audio/text form.<br/>"
+          "• <b>No Anonymous Consultations:</b> Anonymous medical guidance is strictly prohibited under NMC regulations.")
+    story.append(Paragraph(p2, body_text))
+
+    story.append(Paragraph("3. Prescribing Matrix & Drug Restrictions", section_heading))
+    p3 = ("• <b>List O (Allowed across all modes):</b> Over-the-counter (OTC) drugs, ORS, Paracetamol, antacids, cough lozenges, and vitamins.<br/>"
+          "• <b>List A (First Consult ONLY on Video):</b> Topicals, eye/ear drops, and refills for chronic diseases (e.g., Diabetes/Hypertension meds) where diagnosis is established.<br/>"
+          "• <b>List B (Follow-up Add-ons):</b> Add-on medications for ongoing chronic care management.<br/>"
+          "• <b>🚫 PROHIBITED DRUGS:</b> Schedule X drugs, Narcotics, and habit-forming psychotropic substances CANNOT be prescribed via telemedicine.")
+    story.append(Paragraph(p3, body_text))
+
+    story.append(Paragraph("4. E-Prescription Format & Validity", section_heading))
+    p4 = ("• <b>Generic Names in CAPITAL Letters:</b> All prescribed drugs must be written in capital letters with clear dosage, frequency, and duration.<br/>"
+          "• <b>Validity Window:</b> E-Prescriptions remain legally valid for <b>2 weeks</b> from the date of issue or until dispensed.<br/>"
+          "• <b>Digital Signature / Stamp:</b> Must feature the doctor's digital signature, seal, and registration details.")
+    story.append(Paragraph(p4, body_text))
+
+    story.append(Paragraph("5. Record Keeping, Data Privacy & AI Disclaimers", section_heading))
+    p5 = ("• <b>3-Year Mandatory Record Storage:</b> Interaction logs, patient histories, and e-prescriptions must be securely retained for 3 years under DPDP Act 2023.<br/>"
+          "• <b>AI Usage Rule:</b> AI tools and chatbots are strictly restricted from counseling or prescribing. Final clinical decisions must be directly delivered by a Registered Medical Practitioner (RMP).<br/>"
+          "• <b>Emergency Triage:</b> Emergency cases must be directed to immediate in-person emergency facilities after providing basic first-aid guidance.")
+    story.append(Paragraph(p5, body_text))
+
+    story.append(Spacer(1, 10))
+    story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#0b3c5d'), spaceAfter=10))
+
+    footer_text = ("<b>N2 Care Teleclinic</b> &bull; Board of Doctors: Dr. Vigneshwar, MBBS, MD (TNMC Reg No: 159693) | "
+                   "Dr. S. Malathi, MBBS, MD &bull; Helpline: +91 94868 72627")
+    story.append(Paragraph(footer_text, subtitle_style))
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
+# Helper Functions
+def get_detailed_whatsapp_url(mode, name, age, gender, city, abha, service_name, notes, report_link, lang):
     if "Tamil" in lang:
         msg = f"🏥 *N2 CARE TELECLINIC - மருத்துவ ஆலோசனை விண்ணப்பம்*\n"
         msg += f"━━━━━━━━━━━━━━━━━━━━━━\n"
@@ -69,6 +173,7 @@ def get_detailed_whatsapp_url(mode, name, age, gender, city, service_name, notes
         msg += f"👤 *நோயாளி பெயர்:* {name if name else 'குறிப்பிடப்படவில்லை'}\n"
         msg += f"🎂 *வயது / பாலினம்:* {age} வயது | {gender}\n"
         msg += f"📍 *ஊர் / மாவட்டம்:* {city if city else 'குறிப்பிடப்படவில்லை'}\n"
+        msg += f"🆔 *ABHA ID / முகவரி:* {abha if abha else 'வழங்கப்படவில்லை'}\n"
         msg += f"🩺 *ஆலோசனைப் பிரிவு:* {service_name}\n"
         msg += f"🏷️ *கட்டணம்:* {CONSULTATION_FEE}\n"
         if report_link:
@@ -84,6 +189,7 @@ def get_detailed_whatsapp_url(mode, name, age, gender, city, service_name, notes
         msg += f"👤 *Patient Name:* {name if name else 'Not Provided'}\n"
         msg += f"🎂 *Age / Gender:* {age} yrs | {gender}\n"
         msg += f"📍 *Location/City:* {city if city else 'Not Provided'}\n"
+        msg += f"🆔 *ABHA ID / Address:* {abha if abha else 'Not Provided'}\n"
         msg += f"🩺 *Focus Area:* {service_name}\n"
         msg += f"🏷️ *Fee:* {CONSULTATION_FEE}\n"
         if report_link:
@@ -313,7 +419,7 @@ else:
         tab1, tab2, tab3, tab4, tab5 = st.tabs([
             "🤝 நோயாளி முன்பதிவுத் தளம்",
             "🩺 மருத்துவ ஆலோசனைப் பிரிவுகள்",
-            "🌐 மருத்துவமனை வழிகாட்டி",
+            "📜 NMC சட்ட விதிமுறைகள் (PDF)",
             "🔒 மருத்துவர் உள்நுழைவு",
             "🔒 நோயாளி தரவுத்தளம் & மருந்துச் சீட்டு"
         ])
@@ -321,7 +427,7 @@ else:
         tab1, tab2, tab3, tab4, tab5 = st.tabs([
             "🤝 Patient Portal & Booking",
             "🩺 Specialty Services & Packages",
-            "🌐 Regional Directory",
+            "📜 NMC Compliance Guidelines (PDF)",
             "🔒 Doctor Dashboard",
             "🔒 Database & E-Prescription"
         ])
@@ -330,7 +436,7 @@ else:
     with tab1:
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # 🌟 DOCTOR AVATAR TOGGLE SELECTOR 🌟
+        # DOCTOR AVATAR TOGGLE SELECTOR
         if selected_lang == "தமிழ் (Tamil)":
             st.subheader("ஆலோசனை வகையைத் தேர்ந்தெடுக்கவும் (Choose Consultation Mode):")
         else:
@@ -344,11 +450,11 @@ else:
             card_class = "doc-avatar-card-selected" if is_fresh else "doc-avatar-card"
             
             st.markdown(f'<div class="{card_class}">', unsafe_allow_html=True)
-            v_img_files = ["doc_vigneshwar.png", "116810.png", "doc_vigneshwar.jpg"]
+            v_img_files = ["doc_vigneshwar.png", "117983.png", "116810.png", "doc_vigneshwar.jpg"]
             v_found = False
             for img in v_img_files:
                 if os.path.exists(img):
-                    st.image(img, width=120)
+                    st.image(img, use_container_width=True)
                     v_found = True
                     break
             if not v_found:
@@ -386,7 +492,7 @@ else:
             m_found = False
             for img in m_img_files:
                 if os.path.exists(img):
-                    st.image(img, width=120)
+                    st.image(img, use_container_width=True)
                     m_found = True
                     break
             if not m_found:
@@ -438,27 +544,33 @@ else:
             with f_col4:
                 p_city = st.text_input("4. ஊர் / மாவட்டம் *", placeholder="எ.கா. திருச்சி / சென்னை")
             with f_col5:
-                p_service = st.selectbox("5. ஆலோசனை தேவைப்படும் பகுதி *", [
-                    "உணவுப் பழக்க வழக்கம் (DASH Diet & Diabetic Diet)",
-                    "சர்க்கரை & ரத்த அழுத்த மேலாண்மை (Diabetes & HTN)",
-                    "இதயம் & சிறுநீரக பாதுகாப்பு (Drug Dosage Monitoring)",
-                    "தடுப்பூசி வழிகாட்டுதல் (Vaccination Guidance)",
-                    "பரிவுப் பராமரிப்பு (Palliative Care)",
-                    "நாள்பட்ட வலி மேலாண்மை (Chronic Pain)",
-                    "இரத்த பரிசோதனை அறிக்கை ஆய்வு (Lab Report Review)",
-                    "ஸ்கேன் அறிக்கை ஆய்வு (CT / MRI Scan Opinion)"
-                ])
+                p_abha = st.text_input("5. ABHA ID / முகவரி (விருப்பமிருந்தால்):", placeholder="எ.கா. 12-3456-7890-1234 அல்லது name@abdm")
 
-            p_notes = st.text_area("6. அறிகுறிகள் அல்லது மருத்துவ கேள்விகள்:", placeholder="எ.கா. சர்க்கரை அளவு மற்றும் மாத்திரை அளவு பற்றி கேட்க வேண்டும்...")
-            p_link = st.text_input("7. ஸ்கேன் / ரிப்போர்ட் லிங்க் (விருப்பமிருந்தால்):", placeholder="https://drive.google.com/...")
+            p_service = st.selectbox("6. ஆலோசனை தேவைப்படும் பகுதி *", [
+                "உணவுப் பழக்க வழக்கம் (DASH Diet & Diabetic Diet)",
+                "சர்க்கரை & ரத்த அழுத்த மேலாண்மை (Diabetes & HTN)",
+                "இதயம் & சிறுநீரக பாதுகாப்பு (Drug Dosage Monitoring)",
+                "தடுப்பூசி வழிகாட்டுதல் (Vaccination Guidance)",
+                "பரிவுப் பராமரிப்பு (Palliative Care)",
+                "நாள்பட்ட வலி மேலாண்மை (Chronic Pain)",
+                "இரத்த பரிசோதனை அறிக்கை ஆய்வு (Lab Report Review)",
+                "ஸ்கேன் அறிக்கை ஆய்வு (CT / MRI Scan Opinion)"
+            ])
 
-            wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_service, p_notes, p_link, "தமிழ் (Tamil)")
+            p_notes = st.text_area("7. அறிகுறிகள் அல்லது மருத்துவ கேள்விகள்:", placeholder="எ.கா. சர்க்கரை அளவு மற்றும் மாத்திரை அளவு பற்றி கேட்க வேண்டும்...")
+            p_link = st.text_input("8. ஸ்கேன் / ரிப்போர்ட் லிங்க் (விருப்பமிருந்தால்):", placeholder="https://drive.google.com/...")
+
+            # ABHA Creation Guidance Banner
+            st.info("💡 **ABHA ID இல்லையா?** டிஜிட்டல் முறையில் உங்கள் மருத்துவ பதிவுகளை இணைக்க ABHA ID உதவுகிறது. இலவசமாக [abha.abdm.gov.in](https://abha.abdm.gov.in/) தளத்தில் உருவாக்கலாம்.")
+
+            wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_abha, p_service, p_notes, p_link, "தமிழ் (Tamil)")
 
             st.markdown(f'''
                 <br>
                 <a href="{wa_custom_url}" target="_blank" class="btn-wa" style="font-size: 17px;">
                     💬 படிவத்தை சமர்ப்பித்து வாட்ஸ்அப்பில் தொடங்கவும் (கட்டணம்: {CONSULTATION_FEE})
                 </a>
+                <p style="font-size:11.5px; color:#64748b; text-align:center; margin-top:8px;">🔒 DPDP Act 2023 & NMC விதிகள் படி உங்கள் தகவல்கள் பாதுகாப்பாகப் பராமரிக்கப்படும்.</p>
                 </div>
             ''', unsafe_allow_html=True)
 
@@ -481,27 +593,33 @@ else:
             with f_col4:
                 p_city = st.text_input("4. City / Location *", placeholder="e.g. Trichy / Chennai")
             with f_col5:
-                p_service = st.selectbox("5. Focus Area *", [
-                    "Diet Advice (DASH Diet & Diabetic Diet)",
-                    "Diabetic & HTN Management",
-                    "Heart & Kidney Care (Drug Dosage Monitoring)",
-                    "Vaccination Doubts & Schedule Guidance",
-                    "Palliative Care & Comfort Support",
-                    "Chronic Pain Management",
-                    "Lab & Blood Report Review",
-                    "CT / MRI Scan Second Opinion"
-                ])
+                p_abha = st.text_input("5. ABHA ID / Address (Optional):", placeholder="e.g. 12-3456-7890-1234 or name@abdm")
 
-            p_notes = st.text_area("6. Describe Your Symptoms or Clinical Questions:", placeholder="e.g. Want advice on diabetic diet plan and HbA1c report review. Currently taking Metformin 500mg...")
-            p_link = st.text_input("7. Google Drive / Scan Report Link (Optional):", placeholder="https://drive.google.com/...")
+            p_service = st.selectbox("6. Focus Area *", [
+                "Diet Advice (DASH Diet & Diabetic Diet)",
+                "Diabetic & HTN Management",
+                "Heart & Kidney Care (Drug Dosage Monitoring)",
+                "Vaccination Doubts & Schedule Guidance",
+                "Palliative Care & Comfort Support",
+                "Chronic Pain Management",
+                "Lab & Blood Report Review",
+                "CT / MRI Scan Second Opinion"
+            ])
 
-            wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_service, p_notes, p_link, "English")
+            p_notes = st.text_area("7. Describe Your Symptoms or Clinical Questions:", placeholder="e.g. Want advice on diabetic diet plan and HbA1c report review. Currently taking Metformin 500mg...")
+            p_link = st.text_input("8. Google Drive / Scan Report Link (Optional):", placeholder="https://drive.google.com/...")
+
+            # ABHA Creation Guidance Banner
+            st.info("💡 **Don't have an ABHA ID?** ABHA ID helps link all your medical records digitally across India. You can create your free ABHA ID instantly at [abha.abdm.gov.in](https://abha.abdm.gov.in/).")
+
+            wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_abha, p_service, p_notes, p_link, "English")
 
             st.markdown(f'''
                 <br>
                 <a href="{wa_custom_url}" target="_blank" class="btn-wa" style="font-size: 17px;">
                     💬 Submit Form & Launch WhatsApp Consultation Request (Fee: {CONSULTATION_FEE})
                 </a>
+                <p style="font-size:11.5px; color:#64748b; text-align:center; margin-top:8px;">🔒 Data strictly encrypted & processed as per DPDP Act 2023 and NMC Regulations.</p>
                 </div>
             ''', unsafe_allow_html=True)
 
@@ -611,9 +729,33 @@ else:
                     </div>
                 """, unsafe_allow_html=True)
 
-    # TAB 3: Directory
+    # 🌟 TAB 3: NMC COMPLIANCE & LEGAL PDF DOWNLOAD TAB 🌟
     with tab3:
-        st.subheader("🌐 Regional & National Medical Directory")
+        st.subheader("📜 NMC Telemedicine Legal Compliance Guidelines")
+        st.write("Summary of key legal, clinical, and data privacy protocols governing **N2 Care Teleclinic** based on National Medical Commission (NMC) Regulations & NHSRC Framework:")
+
+        # Download PDF Button
+        pdf_data = generate_nmc_compliance_pdf()
+        st.download_button(
+            label="📥 Download Official NMC Compliance PDF Roadmap",
+            data=pdf_data,
+            file_name="N2_Care_Teleclinic_NMC_Compliance_Roadmap.pdf",
+            mime="application/pdf",
+            type="primary"
+        )
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        st.markdown("""
+            <div style="background: #ffffff; border: 2px solid #0b3c5d; padding: 22px; border-radius: 16px;">
+                <h4 style="color: #0b3c5d !important; margin-top:0;">⚖️ Key Telemedicine Rules Summary</h4>
+                <p style="font-size: 13.5px; color: #334155;"><b>1. Practitioner Credentials:</b> Name, MBBS/MD qualifications, and State Medical Council Reg No (e.g., TNMC Reg No: 159693) displayed on all Rx pads and digital chats.</p>
+                <p style="font-size: 13.5px; color: #334155;"><b>2. Minor Consultations:</b> Consultations for patients under 18 years proceed only in the presence of an adult parent/guardian.</p>
+                <p style="font-size: 13.5px; color: #334155;"><b>3. Drug Prescription Categories:</b> OTC medications allowed across all modes (List O). Prescription topicals and refills allowed during Video Consultations (List A). Narcotic, Schedule X, and habit-forming drugs are strictly prohibited.</p>
+                <p style="font-size: 13.5px; color: #334155;"><b>4. Record Retention:</b> Patient histories, diagnostic uploads, and consultation logs retained securely for a mandatory minimum of 3 years under DPDP Act 2023.</p>
+                <p style="font-size: 13.5px; color: #334155;"><b>5. Human Doctor Mandate:</b> AI tools cannot prescribe or independently counsel. All clinical decisions are directly rendered by registered doctors.</p>
+            </div>
+        """, unsafe_allow_html=True)
 
     # TAB 4: Doctor Internal Portal
     with tab4:
@@ -630,23 +772,24 @@ else:
                     gender = st.selectbox("3. Gender", ["Male", "Female", "Other"])
                     phone = st.text_input("4. Contact Number")
                     address = st.text_area("5. Address", height=80)
+                    doc_abha = st.text_input("6. ABHA Number / Address (Optional)", placeholder="12-3456-7890-1234")
                 with col2:
-                    consultation_type = st.selectbox("6. Consultation Focus", [
+                    consultation_type = st.selectbox("7. Consultation Focus", [
                         "Second Opinion (Report Review)",
                         "Drug / Medication Clarification",
                         "Diet & Nutrition Planning",
                         "Disease Progression Tracker",
                         "General Medical Consultation"
                     ])
-                    preferred_slot = st.selectbox("7. Review Time Slot", [
+                    preferred_slot = st.selectbox("8. Review Time Slot", [
                         "4:00 PM - 4:30 PM",
                         "4:30 PM - 5:00 PM",
                         "5:00 PM - 5:30 PM",
                         "5:30 PM - 6:00 PM"
                     ])
-                    followup_date = st.date_input("8. Follow-Up Date")
+                    followup_date = st.date_input("9. Follow-Up Date")
                     
-                    st.markdown("<b>9. Patient Vitals:</b>", unsafe_allow_html=True)
+                    st.markdown("<b>10. Patient Vitals:</b>", unsafe_allow_html=True)
                     v_col1, v_col2, v_col3, v_col4 = st.columns(4)
                     bp = v_col1.text_input("BP", placeholder="120/80")
                     pulse = v_col2.text_input("Pulse", placeholder="72")
@@ -656,13 +799,13 @@ else:
                 st.markdown("---")
                 col_c1, col_c2 = st.columns(2)
                 with col_c1:
-                    complaints = st.text_area("10. Chief Complaints / Symptoms", height=100)
-                    investigation = st.text_area("11. Lab Reports & Scans Review", height=100)
+                    complaints = st.text_area("11. Chief Complaints / Symptoms", height=100)
+                    investigation = st.text_area("12. Lab Reports & Scans Review", height=100)
                 with col_c2:
-                    treatment_history = st.text_area("12. Clinical Advice / Notes", height=100)
+                    treatment_history = st.text_area("13. Clinical Advice / Notes", height=100)
                     prescription_details = st.text_area(
-                        "13. Digital E-Prescription (Drug | Dosage | Duration | Instruction)", 
-                        placeholder="1. Tab Paracetamol 650mg | 1-0-1 | 5 days | After Food",
+                        "14. Digital E-Prescription (Drug | Dosage | Duration | Instruction)", 
+                        placeholder="1. TAB PARACETAMOL 650MG | 1-0-1 | 5 days | After Food",
                         height=100
                     )
 
@@ -674,13 +817,13 @@ else:
                             entry_date, patient_name, age, gender, phone, address, 
                             bp, pulse, spo2, temp, complaints, investigation, 
                             treatment_history, prescription_details, consultation_type, 
-                            preferred_slot, followup_date
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            preferred_slot, followup_date, abha_id
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ''', (
                         entry_time, patient_name, age, gender, phone, address,
                         bp, pulse, spo2, temp, complaints, investigation,
                         treatment_history, prescription_details, consultation_type,
-                        preferred_slot, str(followup_date)
+                        preferred_slot, str(followup_date), doc_abha
                     ))
                     conn.commit()
                     st.success(f"Record successfully saved for {patient_name}!")
@@ -710,10 +853,11 @@ else:
                         <div style="text-align: center; border-bottom: 2px solid #0b3c5d; padding-bottom: 12px; margin-bottom: 20px;">
                             <h2 style="color: #0b3c5d !important; margin: 0;">N2 CARE TELECLINIC</h2>
                             <p style="margin: 3px 0; font-style: italic; font-weight: 700;">"Your Friendly Second Opinion"</p>
-                            <small><b>Dr. Vigneshwar</b>, MBBS, MD (TNMC Reg No 159693) | <b>Dr. S. Malathi</b>, MBBS, MD</small><br>
+                            <small><b>Dr. Vigneshwar</b>, MBBS, MD (TNMC Reg No: 159693) | <b>Dr. S. Malathi</b>, MBBS, MD</small><br>
                             <small>WhatsApp: +91 94868 72627 | UPI: 9486872627@upi</small>
                         </div>
                         <p><b>Patient Name:</b> {patient_row['patient_name']} &nbsp;|&nbsp; <b>Age/Gender:</b> {patient_row['age']} yrs / {patient_row['gender']}</p>
+                        <p><b>ABHA ID:</b> {patient_row['abha_id'] if 'abha_id' in patient_row and patient_row['abha_id'] else 'Not Provided'}</p>
                         <p><b>Vitals:</b> BP: {patient_row['bp']} | Pulse: {patient_row['pulse']} | SpO2: {patient_row['spo2']} | Temp: {patient_row['temp']}</p>
                         <p><b>Chief Complaints:</b><br>{patient_row['complaints']}</p>
                         <p><b>Investigations Review:</b><br>{patient_row['investigation']}</p>
