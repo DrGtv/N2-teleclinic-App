@@ -178,7 +178,7 @@ def generate_nmc_compliance_pdf():
     return buffer
 
 # Helper Functions
-def get_detailed_whatsapp_url(mode, name, age, gender, city, id_proof, abha, details_or_complaints, pref_doc, lang):
+def get_detailed_whatsapp_url(mode, name, age, gender, city, id_proof, abha, details_or_complaints, pref_doc, bp, pulse, spo2, temp, lang):
     if "Tamil" in lang:
         msg = f"🏥 *N2 CARE TELECLINIC - மருத்துவ ஆலோசனை விண்ணப்பம்*\n"
         msg += f"━━━━━━━━━━━━━━━━━━━━━━\n"
@@ -193,6 +193,9 @@ def get_detailed_whatsapp_url(mode, name, age, gender, city, id_proof, abha, det
         else:
             msg += f"🩺 *6. இரண்டாம் கட்ட ஆலோசனைப் பிரிவு:* {details_or_complaints}\n"
         msg += f"👨‍⚕️ *7. விருப்பமான மருத்துவர்:* {pref_doc}\n"
+        if bp or pulse or spo2 or temp:
+            msg += f"📊 *சுய உடல் அளவீடுகள் (Vitals):* BP: {bp if bp else 'N/A'} | Pulse: {pulse if pulse else 'N/A'} | SpO2: {spo2 if spo2 else 'N/A'} | Temp: {temp if temp else 'N/A'}\n"
+        msg += f"🎁 *சலுகை:* 7 நாட்களுக்கு இலவச தொடர் ஆலோசனை (7-Day Free Follow-up)\n"
         msg += f"🏷️ *கட்டணம்:* {CONSULTATION_FEE}\n"
         msg += f"━━━━━━━━━━━━━━━━━━━━━━\n"
         msg += f"📩 *குறிப்பு:* எனது இரத்த பரிசோதனை / ஸ்கேன் அறிக்கை / கட்டண ஸ்கிரீன்ஷாட்டை இதில் இணைக்கிறேன். மாலை {REVIEW_HOURS} மணிக்குள் பரிசீலிக்கவும்."
@@ -210,6 +213,9 @@ def get_detailed_whatsapp_url(mode, name, age, gender, city, id_proof, abha, det
         else:
             msg += f"🩺 *6. Second Opinion Focus Area:* {details_or_complaints}\n"
         msg += f"👨‍⚕️ *7. Preferred Doctor:* {pref_doc}\n"
+        if bp or pulse or spo2 or temp:
+            msg += f"📊 *Self-Reported Vitals:* BP: {bp if bp else 'N/A'} | Pulse: {pulse if pulse else 'N/A'} | SpO2: {spo2 if spo2 else 'N/A'} | Temp: {temp if temp else 'N/A'}\n"
+        msg += f"🎁 *Benefit:* Includes 7-Day Free Follow-Up Window\n"
         msg += f"🏷️ *Fee:* {CONSULTATION_FEE}\n"
         msg += f"━━━━━━━━━━━━━━━━━━━━━━\n"
         msg += f"📩 *Note:* I am attaching my blood reports / scan photos / payment screenshot here. Please review between {REVIEW_HOURS}."
@@ -314,6 +320,17 @@ st.markdown("""
         text-align: center;
         box-shadow: 0 10px 30px rgba(188, 108, 37, 0.15);
         margin-top: 15px;
+    }
+
+    .badge-aster {
+        background: #fef08a;
+        color: #854d0e;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 12px;
+        display: inline-block;
+        margin-bottom: 8px;
     }
 
     label {
@@ -451,7 +468,7 @@ else:
     with tab1:
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # 🌟 STEP 1: CHOOSE BETWEEN THE 2 MAIN TABS / BUTTONS ONLY 🌟
+        # 🌟 STEP 1: CHOOSE BETWEEN THE 2 MAIN TABS ONLY 🌟
         if st.session_state.selected_consultation_mode is None:
             if selected_lang == "தமிழ் (Tamil)":
                 st.subheader("ஆலோசனை வகையைத் தேர்ந்தெடுக்கவும் (Choose Consultation Mode):")
@@ -463,6 +480,7 @@ else:
             # Option 1: Fresh Teleconsultation
             with doc_card1:
                 st.markdown('<div class="mode-selection-card">', unsafe_allow_html=True)
+                st.markdown('<span class="badge-aster">🎁 7 DAYS FREE FOLLOW-UP</span>', unsafe_allow_html=True)
                 st.markdown('<div style="font-size: 55px; margin-bottom: 10px;">🟢</div>', unsafe_allow_html=True)
                 if selected_lang == "தமிழ் (Tamil)":
                     st.markdown("""
@@ -485,6 +503,7 @@ else:
             # Option 2: Second Opinion
             with doc_card2:
                 st.markdown('<div class="mode-selection-card">', unsafe_allow_html=True)
+                st.markdown('<span class="badge-aster">💊 REFILL & SCAN OPINION</span>', unsafe_allow_html=True)
                 st.markdown('<div style="font-size: 55px; margin-bottom: 10px;">🔵</div>', unsafe_allow_html=True)
                 if selected_lang == "தமிழ் (Tamil)":
                     st.markdown("""
@@ -504,7 +523,7 @@ else:
                     st.button("Select Second Opinion", key="btn_second", type="primary", use_container_width=True, on_click=set_consultation_mode, args=("Second Opinion",))
                 st.markdown('</div>', unsafe_allow_html=True)
 
-        # 🌟 STEP 2: OPEN FORM AFTER TAB CLICK (Strictly containing your 7 fields) 🌟
+        # 🌟 STEP 2: OPEN FORM AFTER TAB CLICK (Strictly containing 7 fields + Vitals) 🌟
         else:
             consultation_mode = st.session_state.selected_consultation_mode
 
@@ -549,15 +568,24 @@ else:
                     p_details = st.selectbox("6. இரண்டாம் கட்ட ஆலோசனை தேவைப்படும் பிரிவு (Specific Focus Area) *:", [
                         "உணவுப் பழக்க வழக்கம் & DASH Diet (Diet Advice & DASH Diet)",
                         "சர்க்கரை & ரத்த அழுத்த மேலாண்மை (Diabetes & HTN Management)",
-                        "மருந்துகளின் செயல்பாடு & பாதுகாப்பு (Drugs Action & Safety)",
+                        "நாள்பட்ட மருந்து ரீஃபில் & பாதுகாப்பு (Prescription Refill & Safety Review)",
+                        "மருந்துகளின் செயல்பாடு & பக்கவிளைவுகள் (Drugs Action & Safety)",
                         "CT / MRI ஸ்கேன் அறிக்கை ஆய்வு (CT / MRI Scan Opinion)",
                         "இரத்த பரிசோதனை அறிக்கை ஆய்வு (Blood Test / Lab Review)",
                         "இதயம் & சிறுநீரகப் பாதுகாப்பு (Heart & Kidney Care)"
                     ])
 
-                st.info("💡 **ABHA ID இல்லையா?** டிஜிட்டல் முறையில் உங்கள் மருத்துவ பதிவுகளை இணைக்க ABHA ID உதவுகிறது. இலவசமாக [abha.abdm.gov.in](https://abha.abdm.gov.in/) தளத்தில் உருவாக்கலாம்.")
+                # Optional Vitals Collection (Aster Clinic Feature)
+                with st.expander("🩺 வீட்டில் சுய பரிசோதனை அளவீடுகள் (Self-Reported Vitals - Optional)"):
+                    v_col1, v_col2, v_col3, v_col4 = st.columns(4)
+                    p_bp = v_col1.text_input("BP (ரத்த அழுத்தம்)", placeholder="120/80")
+                    p_pulse = v_col2.text_input("Pulse (நாடித்துடிப்பு)", placeholder="72")
+                    p_spo2 = v_col3.text_input("SpO2 %", placeholder="98%")
+                    p_temp = v_col4.text_input("Temp (வெப்பநிலை)", placeholder="98.6 F")
 
-                wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_id_proof, p_abha, p_details, p_pref_doc, "தமிழ் (Tamil)")
+                st.success("🎁 **Aster Style Benefit:** இந்த ஆலோசனையுடன் 7 நாட்களுக்குள் சந்தேகங்கள் கேட்க **இலவசத் தொடர் ஆலோசனை (7-Day Free Follow-Up)** பொருந்தும்.")
+
+                wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_id_proof, p_abha, p_details, p_pref_doc, p_bp, p_pulse, p_spo2, p_temp, "தமிழ் (Tamil)")
 
                 st.markdown(f'''
                     <br>
@@ -605,15 +633,24 @@ else:
                     p_details = st.selectbox("6. Specific Focus Area *:", [
                         "Diet Advice & DASH Diet Plan",
                         "Diabetes & HTN Management",
+                        "Prescription Refill & Chronic Care Safety Review",
                         "Drugs Action & Safety Clarifications",
                         "CT / MRI Scan Opinion",
                         "Blood Test / Lab Report Review",
                         "Heart & Kidney Care Guidance"
                     ])
 
-                st.info("💡 **Don't have an ABHA ID?** ABHA ID helps link all your medical records digitally across India. You can create your free ABHA ID instantly at [abha.abdm.gov.in](https://abha.abdm.gov.in/).")
+                # Optional Vitals Collection (Aster Clinic Feature)
+                with st.expander("🩺 Self-Reported Home Vitals (Optional)"):
+                    v_col1, v_col2, v_col3, v_col4 = st.columns(4)
+                    p_bp = v_col1.text_input("BP", placeholder="120/80")
+                    p_pulse = v_col2.text_input("Pulse", placeholder="72")
+                    p_spo2 = v_col3.text_input("SpO2 %", placeholder="98%")
+                    p_temp = v_col4.text_input("Temp", placeholder="98.6 F")
 
-                wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_id_proof, p_abha, p_details, p_pref_doc, "English")
+                st.success("🎁 **Aster Style Assurance:** Includes a **7-Day Free Follow-Up Window** for any prescription doubts or review queries.")
+
+                wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_id_proof, p_abha, p_details, p_pref_doc, p_bp, p_pulse, p_spo2, p_temp, "English")
 
                 st.markdown(f'''
                     <br>
@@ -669,7 +706,7 @@ else:
             with s_col1:
                 st.markdown("""
                     <div class="service-box">
-                        <h4 style="color: #0b3c5d !important; margin-top:0;">🥗 1. உணவுப் பழக்க வழக்கம்</h4>
+                        <h4 style="color: #0b3c5d !important; margin-top:0;">🥗 1. உணவுப் பழக்க வழக்கம் & DASH Diet</h4>
                         <p style="font-size:13px;">இரத்த அழுத்தத்தைக் கட்டுப்படுத்த <b>DASH Diet</b> திட்டம் மற்றும் சர்க்கரை அளவை நிர்வகிக்க <b>Diabetic Diet</b> வழிகாட்டுதல்.</p>
                     </div>
                     <div class="service-box">
@@ -677,15 +714,15 @@ else:
                         <p style="font-size:13px;">இரத்தச் சர்க்கரை இலக்கு மதிப்பீடு, இரத்த அழுத்தக் கண்காணிப்பு மற்றும் நீண்டகால உடல்நலப் பாதுகாப்பு.</p>
                     </div>
                     <div class="service-box">
-                        <h4 style="color: #0b3c5d !important; margin-top:0;">🫀 3. இதயம் & சிறுநீரக பாதுகாப்பு</h4>
-                        <p style="font-size:13px;">துல்லியமான <b>மருந்து அளவு கண்காணிப்பு (Drug Dosage Monitoring)</b> மற்றும் சிறுநீரகச் செயல்பாட்டுப் பாதுகாப்பு.</p>
+                        <h4 style="color: #0b3c5d !important; margin-top:0;">💊 3. நாள்பட்ட மருந்து ரீஃபில் & மருந்துச் செயல்பாடு</h4>
+                        <p style="font-size:13px;">நீண்டகால மாத்திரைகளின் பாதுகாப்பான பயன்பாடு, <b>Drug Dosage Monitoring</b> மற்றும் பக்கவிளைவு ஆலோசனைகள்.</p>
                     </div>
                 """, unsafe_allow_html=True)
             with s_col2:
                 st.markdown("""
                     <div class="service-box">
-                        <h4 style="color: #0b3c5d !important; margin-top:0;">💉 4. தடுப்பூசி வழிகாட்டுதல்</h4>
-                        <p style="font-size:13px;">பெரியவர்கள் மற்றும் குழந்தைகளுக்கான தடுப்பூசி அட்டவணை மற்றும் பாதுகாப்பு ஆலோசனைகள்.</p>
+                        <h4 style="color: #0b3c5d !important; margin-top:0;">📑 4. CT / MRI ஸ்கேன் & லேப் ரிப்போர்ட் ஆய்வு</h4>
+                        <p style="font-size:13px;">ஸ்கேன் மற்றும் இரத்த பரிசோதனை அறிக்கைகளுக்கான துல்லியமான இரண்டாம் கட்ட மருத்துவ கருத்து (Second Opinion).</p>
                     </div>
                     <div class="service-box">
                         <h4 style="color: #0b3c5d !important; margin-top:0;">🕊️ 5. பரிவுப் பராமரிப்பு (Palliative Care)</h4>
@@ -702,7 +739,7 @@ else:
             with s_col1:
                 st.markdown("""
                     <div class="service-box">
-                        <h4 style="color: #0b3c5d !important; margin-top:0;">🥗 1. Diet Advice</h4>
+                        <h4 style="color: #0b3c5d !important; margin-top:0;">🥗 1. Diet Advice & DASH Diet</h4>
                         <p style="font-size:13px;">Tailored <b>DASH Diet</b> plans for Blood Pressure control and customized <b>Diabetic Diet</b> plans.</p>
                     </div>
                     <div class="service-box">
@@ -710,15 +747,15 @@ else:
                         <p style="font-size:13px;">Blood glucose target evaluations, blood pressure trend reviews, and long-term metabolic risk prevention.</p>
                     </div>
                     <div class="service-box">
-                        <h4 style="color: #0b3c5d !important; margin-top:0;">🫀 3. Heart & Kidney Care</h4>
-                        <p style="font-size:13px;">Precise <b>Drug Dosage Monitoring</b> and renal filtration safety checks.</p>
+                        <h4 style="color: #0b3c5d !important; margin-top:0;">💊 3. Prescription Refills & Drug Action</h4>
+                        <p style="font-size:13px;">Precise <b>Drug Dosage Monitoring</b>, chronic medication refills, and drug interaction safety checks.</p>
                     </div>
                 """, unsafe_allow_html=True)
             with s_col2:
                 st.markdown("""
                     <div class="service-box">
-                        <h4 style="color: #0b3c5d !important; margin-top:0;">💉 4. Vaccination Guidance</h4>
-                        <p style="font-size:13px;">Adult & pediatric immunization schedule guidance and vaccine safety evaluations.</p>
+                        <h4 style="color: #0b3c5d !important; margin-top:0;">📑 4. CT / MRI Scan & Lab Review</h4>
+                        <p style="font-size:13px;">Expert second opinion on blood investigations, CT/MRI scan imaging reports, and diagnostic clarity.</p>
                     </div>
                     <div class="service-box">
                         <h4 style="color: #0b3c5d !important; margin-top:0;">🕊️ 5. Palliative Care</h4>
@@ -781,9 +818,10 @@ else:
                 with col2:
                     consultation_type = st.selectbox("8. Consultation Focus", [
                         "Second Opinion (Report Review)",
+                        "Prescription Refill & Chronic Care",
                         "Drug / Medication Clarification",
-                        "Diet & Nutrition Planning",
-                        "Disease Progression Tracker",
+                        "Diet & DASH Diet Planning",
+                        "CT / MRI Scan Review",
                         "General Medical Consultation"
                     ])
                     preferred_slot = st.selectbox("9. Review Time Slot", [
