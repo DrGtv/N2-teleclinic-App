@@ -40,7 +40,7 @@ REVIEW_HOURS = "4:00 PM – 6:00 PM (Daily)"
 
 # Doctor Passcodes
 DOCTOR_PINS = {
-    "1596": "Dr. Vigneshwar",
+    "1596": "Dr. T. Vigneshwar",
     "2026": "Dr. S. Malathi"
 }
 
@@ -49,7 +49,7 @@ def authenticate_doctor(input_pin):
     if not input_pin:
         return None
     if input_pin == "1596":
-        return "Dr. Vigneshwar"
+        return "Dr. T. Vigneshwar"
     elif input_pin == "2026":
         return "Dr. S. Malathi"
     return None
@@ -59,7 +59,14 @@ if 'app_language' not in st.session_state:
     st.session_state.app_language = None
 
 if 'selected_consultation_mode' not in st.session_state:
-    st.session_state.selected_consultation_mode = "Fresh Teleconsultation"
+    st.session_state.selected_consultation_mode = None
+
+# Callback Functions for Fast Page Switching
+def set_consultation_mode(mode_name):
+    st.session_state.selected_consultation_mode = mode_name
+
+def reset_consultation_mode():
+    st.session_state.selected_consultation_mode = None
 
 # 2. Database Initialization
 conn = sqlite3.connect('n2_teleclinic.db', check_same_thread=False)
@@ -85,7 +92,9 @@ c.execute('''
         consultation_type TEXT,
         preferred_slot TEXT,
         followup_date TEXT,
-        abha_id TEXT
+        abha_id TEXT,
+        id_card_details TEXT,
+        preferred_doctor TEXT
     )
 ''')
 conn.commit()
@@ -127,8 +136,8 @@ def generate_nmc_compliance_pdf():
     story.append(Spacer(1, 8))
 
     story.append(Paragraph("1. Mandatory Identity & Credential Display", section_heading))
-    p1 = ("• <b>Doctor Identification:</b> Every teleconsultation, digital message, and prescription MUST display the doctor's full name, MBBS/MD qualifications, State Medical Council Registration Number (e.g., TNMC Reg No: 159693), and official clinic address.<br/>"
-          "• <b>Patient Verification & ABHA Linking:</b> Mandatory collection of Name, Age, Gender, Location, Contact Number, and optional ABHA ID linking.<br/>"
+    p1 = ("• <b>Doctor Identification:</b> Every teleconsultation, digital message, and prescription MUST display the doctors' full names, MBBS/MD qualifications, State Medical Council Registration Numbers (e.g., TNMC Reg No: 159693), and official clinic address.<br/>"
+          "• <b>Patient Verification & ABHA Linking:</b> Mandatory collection of Name, Age, Gender, Location, Contact Number, ID Proof, and optional ABHA ID linking.<br/>"
           "• <b>Minor Protocol (<18 yrs):</b> Consultations for minors proceed ONLY when accompanied by an adult guardian whose identity is recorded.")
     story.append(Paragraph(p1, body_text))
 
@@ -160,7 +169,7 @@ def generate_nmc_compliance_pdf():
     story.append(Spacer(1, 10))
     story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#0b3c5d'), spaceAfter=10))
 
-    footer_text = ("<b>N2 Care Teleclinic</b> &bull; Board of Doctors: Dr. Vigneshwar, MBBS, MD (TNMC Reg No: 159693) | "
+    footer_text = ("<b>N2 Care Teleclinic</b> &bull; Board of Doctors: Dr. T. Vigneshwar, MBBS, MD (TNMC Reg No: 159693) | "
                    "Dr. S. Malathi, MBBS, MD &bull; Helpline: +91 94868 72627")
     story.append(Paragraph(footer_text, subtitle_style))
 
@@ -169,37 +178,39 @@ def generate_nmc_compliance_pdf():
     return buffer
 
 # Helper Functions
-def get_detailed_whatsapp_url(mode, name, age, gender, city, abha, service_name, notes, report_link, lang):
+def get_detailed_whatsapp_url(mode, name, age, gender, city, id_proof, abha, details_or_complaints, pref_doc, lang):
     if "Tamil" in lang:
         msg = f"🏥 *N2 CARE TELECLINIC - மருத்துவ ஆலோசனை விண்ணப்பம்*\n"
         msg += f"━━━━━━━━━━━━━━━━━━━━━━\n"
         msg += f"📌 *ஆலோசனை வகை:* {mode}\n"
-        msg += f"👤 *நோயாளி பெயர்:* {name if name else 'குறிப்பிடப்படவில்லை'}\n"
-        msg += f"🎂 *வயது / பாலினம்:* {age} வயது | {gender}\n"
-        msg += f"📍 *ஊர் / மாவட்டம்:* {city if city else 'குறிப்பிடப்படவில்லை'}\n"
-        msg += f"🆔 *ABHA ID / முகவரி:* {abha if abha else 'வழங்கப்படவில்லை'}\n"
-        msg += f"🩺 *ஆலோசனைப் பிரிவு:* {service_name}\n"
+        msg += f"👤 *1. நோயாளி பெயர்:* {name if name else 'குறிப்பிடப்படவில்லை'}\n"
+        msg += f"🎂 *2. வயது / பாலினம்:* {age} வயது | {gender}\n"
+        msg += f"📍 *3. ஊர் / மாவட்டம்:* {city if city else 'குறிப்பிடப்படவில்லை'}\n"
+        msg += f"🪪 *4. அடையாள அட்டை (ID):* {id_proof if id_proof else 'வழங்கப்படவில்லை'}\n"
+        msg += f"🆔 *5. ABHA ID / முகவரி:* {abha if abha else 'வழங்கப்படவில்லை'}\n"
+        if mode == "Fresh Teleconsultation":
+            msg += f"🩺 *6. அறிகுறிகள் / சந்தேகங்கள்:* {details_or_complaints}\n"
+        else:
+            msg += f"🩺 *6. இரண்டாம் கட்ட ஆலோசனைப் பிரிவு:* {details_or_complaints}\n"
+        msg += f"👨‍⚕️ *7. விருப்பமான மருத்துவர்:* {pref_doc}\n"
         msg += f"🏷️ *கட்டணம்:* {CONSULTATION_FEE}\n"
-        if report_link:
-            msg += f"🔗 *ரிப்போர்ட் லிங்க்:* {report_link}\n"
-        if notes:
-            msg += f"📝 *அறிகுறிகள் / சந்தேகங்கள்:* {notes}\n"
         msg += f"━━━━━━━━━━━━━━━━━━━━━━\n"
         msg += f"📩 *குறிப்பு:* எனது இரத்த பரிசோதனை / ஸ்கேன் அறிக்கை / கட்டண ஸ்கிரீன்ஷாட்டை இதில் இணைக்கிறேன். மாலை {REVIEW_HOURS} மணிக்குள் பரிசீலிக்கவும்."
     else:
         msg = f"🏥 *N2 CARE TELECLINIC - CONSULTATION REQUEST*\n"
         msg += f"━━━━━━━━━━━━━━━━━━━━━━\n"
         msg += f"📌 *Consultation Mode:* {mode}\n"
-        msg += f"👤 *Patient Name:* {name if name else 'Not Provided'}\n"
-        msg += f"🎂 *Age / Gender:* {age} yrs | {gender}\n"
-        msg += f"📍 *Location/City:* {city if city else 'Not Provided'}\n"
-        msg += f"🆔 *ABHA ID / Address:* {abha if abha else 'Not Provided'}\n"
-        msg += f"🩺 *Focus Area:* {service_name}\n"
+        msg += f"👤 *1. Patient Name:* {name if name else 'Not Provided'}\n"
+        msg += f"🎂 *2. Age / Gender:* {age} yrs | {gender}\n"
+        msg += f"📍 *3. Location/City:* {city if city else 'Not Provided'}\n"
+        msg += f"🪪 *4. ID Card Details:* {id_proof if id_proof else 'Not Provided'}\n"
+        msg += f"🆔 *5. ABHA ID / Address:* {abha if abha else 'Not Provided'}\n"
+        if mode == "Fresh Teleconsultation":
+            msg += f"🩺 *6. Chief Complaints / Symptoms:* {details_or_complaints}\n"
+        else:
+            msg += f"🩺 *6. Second Opinion Focus Area:* {details_or_complaints}\n"
+        msg += f"👨‍⚕️ *7. Preferred Doctor:* {pref_doc}\n"
         msg += f"🏷️ *Fee:* {CONSULTATION_FEE}\n"
-        if report_link:
-            msg += f"🔗 *Report Link:* {report_link}\n"
-        if notes:
-            msg += f"📝 *Symptoms / Doubts:* {notes}\n"
         msg += f"━━━━━━━━━━━━━━━━━━━━━━\n"
         msg += f"📩 *Note:* I am attaching my blood reports / scan photos / payment screenshot here. Please review between {REVIEW_HOURS}."
     
@@ -267,23 +278,13 @@ st.markdown("""
         text-align: center;
     }
 
-    .doc-avatar-card {
+    .mode-selection-card {
         background: #ffffff !important;
-        border: 2px solid #dda15e !important;
-        border-radius: 18px !important;
-        padding: 15px !important;
+        border: 2.5px solid #dda15e !important;
+        border-radius: 20px !important;
+        padding: 25px !important;
         text-align: center;
-        box-shadow: 0 6px 18px rgba(188, 108, 37, 0.1) !important;
-        height: 100%;
-    }
-
-    .doc-avatar-card-selected {
-        background: #fefae0 !important;
-        border: 3px solid #0b3c5d !important;
-        border-radius: 18px !important;
-        padding: 15px !important;
-        text-align: center;
-        box-shadow: 0 8px 22px rgba(11, 60, 93, 0.25) !important;
+        box-shadow: 0 8px 22px rgba(188, 108, 37, 0.12) !important;
         height: 100%;
     }
 
@@ -347,7 +348,7 @@ if st.session_state.app_language is None:
             <div style="background: linear-gradient(135deg, #0b3c5d 0%, #1e3a8a 100%); border: 3px solid #dda15e; padding: 40px 20px; border-radius: 22px; text-align: center; color: white;">
                 <h1 style="color: #ffffff !important; font-size: 32px; font-weight: 800;">WELCOME TO N2 CARE TELECLINIC!</h1>
                 <p style="color: #fde047 !important; font-size: 18px; font-weight: 700;">We're here for you and your family. Anytime. Anywhere.</p>
-                <small style="font-size: 14px;">Dr. Vigneshwar, MBBS, MD & Dr. S. Malathi, MBBS, MD</small>
+                <small style="font-size: 14px;">Dr. T. Vigneshwar, MBBS, MD & Dr. S. Malathi, MBBS, MD</small>
             </div>
         """, unsafe_allow_html=True)
 
@@ -392,6 +393,7 @@ else:
     with top_col2:
         if st.button("🔄 Change Language / மொழி மாற்ற", use_container_width=True):
             st.session_state.app_language = None
+            st.session_state.selected_consultation_mode = None
             st.rerun()
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -449,226 +451,215 @@ else:
     with tab1:
         st.markdown("<br>", unsafe_allow_html=True)
         
-        if selected_lang == "தமிழ் (Tamil)":
-            st.subheader("ஆலோசனை வகையைத் தேர்ந்தெடுக்கவும் (Choose Consultation Mode):")
+        # 🌟 STEP 1: CHOOSE BETWEEN THE 2 MAIN TABS / BUTTONS ONLY 🌟
+        if st.session_state.selected_consultation_mode is None:
+            if selected_lang == "தமிழ் (Tamil)":
+                st.subheader("ஆலோசனை வகையைத் தேர்ந்தெடுக்கவும் (Choose Consultation Mode):")
+            else:
+                st.subheader("Select Consultation Mode:")
+
+            doc_card1, doc_card2 = st.columns(2)
+
+            # Option 1: Fresh Teleconsultation
+            with doc_card1:
+                st.markdown('<div class="mode-selection-card">', unsafe_allow_html=True)
+                st.markdown('<div style="font-size: 55px; margin-bottom: 10px;">🟢</div>', unsafe_allow_html=True)
+                if selected_lang == "தமிழ் (Tamil)":
+                    st.markdown("""
+                        <h3 style="color:#0b3c5d; margin:5px 0 2px 0; font-weight:800;">1. புதிய மருத்துவ ஆலோசனை</h3>
+                        <p style="font-size:13px; color:#57534e; margin-top:6px;">புதிய அறிகுறிகள், பொதுவான உடல்நலக் கேள்விகள் மற்றும் நேரடி மருத்துவ வழிகாட்டுதலுக்கு.</p>
+                        <small style="color:#059669; font-weight:700;">Consultation by: Dr. T. Vigneshwar & Dr. S. Malathi</small>
+                    """, unsafe_allow_html=True)
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    st.button("புதிய ஆலோசனை பெறுக (Select Fresh Consult)", key="btn_fresh", type="primary", use_container_width=True, on_click=set_consultation_mode, args=("Fresh Teleconsultation",))
+                else:
+                    st.markdown("""
+                        <h3 style="color:#0b3c5d; margin:5px 0 2px 0; font-weight:800;">1. Fresh Teleconsultation</h3>
+                        <p style="font-size:13px; color:#57534e; margin-top:6px;">For new symptoms, general health queries, and direct doctor guidance.</p>
+                        <small style="color:#059669; font-weight:700;">Consultation by: Dr. T. Vigneshwar & Dr. S. Malathi</small>
+                    """, unsafe_allow_html=True)
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    st.button("Select Fresh Teleconsultation", key="btn_fresh", type="primary", use_container_width=True, on_click=set_consultation_mode, args=("Fresh Teleconsultation",))
+                st.markdown('</div>', unsafe_allow_html=True)
+
+            # Option 2: Second Opinion
+            with doc_card2:
+                st.markdown('<div class="mode-selection-card">', unsafe_allow_html=True)
+                st.markdown('<div style="font-size: 55px; margin-bottom: 10px;">🔵</div>', unsafe_allow_html=True)
+                if selected_lang == "தமிழ் (Tamil)":
+                    st.markdown("""
+                        <h3 style="color:#0b3c5d; margin:5px 0 2px 0; font-weight:800;">2. இரண்டாம் கட்ட ஆலோசனை</h3>
+                        <p style="font-size:13px; color:#57534e; margin-top:6px;">இரத்தப் பரிசோதனை, ஸ்கேன் ரிப்போர்ட், DASH Diet, சர்க்கரை & மருந்துப் பாதுகாப்பு ஆய்வுக்கு.</p>
+                        <small style="color:#0284c7; font-weight:700;">Consultation by: Dr. T. Vigneshwar & Dr. S. Malathi</small>
+                    """, unsafe_allow_html=True)
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    st.button("இரண்டாம் கட்ட ஆலோசனை பெறுக (Select Second Opinion)", key="btn_second", type="primary", use_container_width=True, on_click=set_consultation_mode, args=("Second Opinion",))
+                else:
+                    st.markdown("""
+                        <h3 style="color:#0b3c5d; margin:5px 0 2px 0; font-weight:800;">2. Second Opinion</h3>
+                        <p style="font-size:13px; color:#57534e; margin-top:6px;">For blood test reviews, scan evaluations, DASH diet, diabetes & drug safety checks.</p>
+                        <small style="color:#0284c7; font-weight:700;">Consultation by: Dr. T. Vigneshwar & Dr. S. Malathi</small>
+                    """, unsafe_allow_html=True)
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    st.button("Select Second Opinion", key="btn_second", type="primary", use_container_width=True, on_click=set_consultation_mode, args=("Second Opinion",))
+                st.markdown('</div>', unsafe_allow_html=True)
+
+        # 🌟 STEP 2: OPEN FORM AFTER TAB CLICK (Strictly containing your 7 fields) 🌟
         else:
-            st.subheader("Select Consultation Mode:")
+            consultation_mode = st.session_state.selected_consultation_mode
 
-        doc_card1, doc_card2 = st.columns(2)
-
-        # Avatar 1: Dr. Vigneshwar (Fresh Teleconsultation)
-        with doc_card1:
-            is_fresh = st.session_state.selected_consultation_mode == "Fresh Teleconsultation"
-            card_class = "doc-avatar-card-selected" if is_fresh else "doc-avatar-card"
-            
-            st.markdown(f'<div class="{card_class}">', unsafe_allow_html=True)
-            v_img_files = ["doc_vigneshwar.png", "117983.png", "116810.png", "doc_vigneshwar.jpg"]
-            v_found = False
-            for img in v_img_files:
-                if os.path.exists(img):
-                    st.image(img, use_container_width=True)
-                    v_found = True
-                    break
-            if not v_found:
-                st.markdown('<div style="font-size: 55px;">👨‍⚕️</div>', unsafe_allow_html=True)
+            col_back1, col_back2 = st.columns([3, 1])
+            with col_back2:
+                st.button("← Change Mode / மாற்று", use_container_width=True, on_click=reset_consultation_mode)
 
             if selected_lang == "தமிழ் (Tamil)":
-                st.markdown("""
-                    <h4 style="color:#0b3c5d; margin:5px 0 2px 0;">Dr. Vigneshwar</h4>
-                    <p style="font-size:12px; color:#475569; margin-bottom:8px;">MBBS, MD General Medicine (TNMC 159693)</p>
-                    <b style="color:#059669; font-size:15px;">🟢 1. புதிய மருத்துவ ஆலோசனை</b>
-                    <p style="font-size:12px; color:#57534e; margin-top:4px;">புதிய அறிகுறிகள், பொதுவான உடல்நலக் கேள்விகள் மற்றும் நேரடி வழிகாட்டுதலுக்கு.</p>
+                st.markdown(f"""
+                    <div style="background: #ffffff; border: 2.5px solid #0b3c5d; padding: 25px; border-radius: 16px;">
+                        <h3 style="color: #0b3c5d !important; margin-top: 0;">📋 நோயாளி விவரங்கள் படிவம் ({consultation_mode})</h3>
+                        <p style="font-size: 13.5px; color: #57534e;">உங்கள் விவரங்களை கீழே நிரப்பவும். இவை தானாகவே வாட்ஸ்அப் செய்தியாக மாறும்.</p>
                 """, unsafe_allow_html=True)
-                if st.button("இது தேவை (Select Fresh Consult)", key="btn_fresh", type="primary" if is_fresh else "secondary"):
-                    st.session_state.selected_consultation_mode = "Fresh Teleconsultation"
-                    st.rerun()
+
+                f_col1, f_col2, f_col3 = st.columns(3)
+                with f_col1:
+                    p_name = st.text_input("1. நோயாளி பெயர் *", placeholder="எ.கா. ரமேஷ் குமார்")
+                with f_col2:
+                    p_age = st.number_input("2. வயது *", min_value=1, max_value=110, value=35)
+                with f_col3:
+                    p_gender = st.selectbox("பாலினம் *", ["ஆண்", "பெண்", "மற்றவை"])
+
+                f_col4, f_col5 = st.columns(2)
+                with f_col4:
+                    p_city = st.text_input("3. ஊர் / இடம் *", placeholder="எ.கா. திருச்சி / சென்னை")
+                with f_col5:
+                    p_id_proof = st.text_input("4. அடையாள அட்டை வகை & எண் (ID Card & Number):", placeholder="எ.கா. ஆதார் எண் / வாக்காளர் அட்டை")
+
+                f_col6, f_col7 = st.columns(2)
+                with f_col6:
+                    p_abha = st.text_input("5. ABHA எண் / முகவரி (விருப்பமிருந்தால்):", placeholder="எ.கா. 12-3456-7890-1234 அல்லது name@abdm")
+                with f_col7:
+                    p_pref_doc = st.selectbox("7. விருப்பமான மருத்துவர் (Preferred Doctor):", [
+                        "யார் இருந்தாலும் பரவாயில்லை (Anyone Available)",
+                        "Dr. T. Vigneshwar, MBBS, MD",
+                        "Dr. S. Malathi, MBBS, MD"
+                    ])
+
+                if consultation_mode == "Fresh Teleconsultation":
+                    p_details = st.text_area("6. அறிகுறிகள் / மருத்துவக் கேள்விகள் (Complaints) *:", placeholder="எ.கா. 2 நாட்களாக காய்ச்சல் மற்றும் தலைவலி உள்ளது...")
+                else:
+                    p_details = st.selectbox("6. இரண்டாம் கட்ட ஆலோசனை தேவைப்படும் பிரிவு (Specific Focus Area) *:", [
+                        "உணவுப் பழக்க வழக்கம் & DASH Diet (Diet Advice & DASH Diet)",
+                        "சர்க்கரை & ரத்த அழுத்த மேலாண்மை (Diabetes & HTN Management)",
+                        "மருந்துகளின் செயல்பாடு & பாதுகாப்பு (Drugs Action & Safety)",
+                        "CT / MRI ஸ்கேன் அறிக்கை ஆய்வு (CT / MRI Scan Opinion)",
+                        "இரத்த பரிசோதனை அறிக்கை ஆய்வு (Blood Test / Lab Review)",
+                        "இதயம் & சிறுநீரகப் பாதுகாப்பு (Heart & Kidney Care)"
+                    ])
+
+                st.info("💡 **ABHA ID இல்லையா?** டிஜிட்டல் முறையில் உங்கள் மருத்துவ பதிவுகளை இணைக்க ABHA ID உதவுகிறது. இலவசமாக [abha.abdm.gov.in](https://abha.abdm.gov.in/) தளத்தில் உருவாக்கலாம்.")
+
+                wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_id_proof, p_abha, p_details, p_pref_doc, "தமிழ் (Tamil)")
+
+                st.markdown(f'''
+                    <br>
+                    <a href="{wa_custom_url}" target="_blank" class="btn-wa" style="font-size: 17px;">
+                        💬 படிவத்தை சமர்ப்பித்து வாட்ஸ்அப்பில் தொடங்கவும் (கட்டணம்: {CONSULTATION_FEE})
+                    </a>
+                    <p style="font-size:11.5px; color:#64748b; text-align:center; margin-top:8px;">🔒 DPDP Act 2023 & NMC விதிகள் படி உங்கள் தகவல்கள் பாதுகாப்பாகப் பராமரிக்கப்படும்.</p>
+                    </div>
+                ''', unsafe_allow_html=True)
+
             else:
-                st.markdown("""
-                    <h4 style="color:#0b3c5d; margin:5px 0 2px 0;">Dr. Vigneshwar</h4>
-                    <p style="font-size:12px; color:#475569; margin-bottom:8px;">MBBS, MD General Medicine (TNMC 159693)</p>
-                    <b style="color:#059669; font-size:15px;">🟢 1. Fresh Teleconsultation</b>
-                    <p style="font-size:12px; color:#57534e; margin-top:4px;">For new symptoms, general health queries, and direct doctor guidance.</p>
+                st.markdown(f"""
+                    <div style="background: #ffffff; border: 2.5px solid #0b3c5d; padding: 25px; border-radius: 16px;">
+                        <h3 style="color: #0b3c5d !important; margin-top: 0; font-size: 22px;">📋 Patient Details & Consultation Form ({consultation_mode})</h3>
+                        <p style="font-size: 13.5px; color: #57534e;">Please fill out your details below. These will be formatted and pre-filled into WhatsApp automatically.</p>
                 """, unsafe_allow_html=True)
-                if st.button("Select Fresh Teleconsultation", key="btn_fresh", type="primary" if is_fresh else "secondary"):
-                    st.session_state.selected_consultation_mode = "Fresh Teleconsultation"
-                    st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
 
-        # Avatar 2: Dr. S. Malathi (Second Opinion)
-        with doc_card2:
-            is_second = st.session_state.selected_consultation_mode == "Second Opinion"
-            card_class = "doc-avatar-card-selected" if is_second else "doc-avatar-card"
-            
-            st.markdown(f'<div class="{card_class}">', unsafe_allow_html=True)
-            m_img_files = ["doc_malathi.png", "116809.png", "doc_malathi.jpg"]
-            m_found = False
-            for img in m_img_files:
-                if os.path.exists(img):
-                    st.image(img, use_container_width=True)
-                    m_found = True
-                    break
-            if not m_found:
-                st.markdown('<div style="font-size: 55px;">👩‍⚕️</div>', unsafe_allow_html=True)
+                f_col1, f_col2, f_col3 = st.columns(3)
+                with f_col1:
+                    p_name = st.text_input("1. Patient Name *", placeholder="e.g. Ramesh Kumar")
+                with f_col2:
+                    p_age = st.number_input("2. Age *", min_value=1, max_value=110, value=35)
+                with f_col3:
+                    p_gender = st.selectbox("Gender *", ["Male", "Female", "Other"])
 
+                f_col4, f_col5 = st.columns(2)
+                with f_col4:
+                    p_city = st.text_input("3. Place / Location *", placeholder="e.g. Trichy / Chennai")
+                with f_col5:
+                    p_id_proof = st.text_input("4. ID Card Type & Number:", placeholder="e.g. Aadhaar No / Voter ID")
+
+                f_col6, f_col7 = st.columns(2)
+                with f_col6:
+                    p_abha = st.text_input("5. ABHA Number / Address (Optional):", placeholder="e.g. 12-3456-7890-1234 or name@abdm")
+                with f_col7:
+                    p_pref_doc = st.selectbox("7. Preferred Doctor:", [
+                        "Anyone Available",
+                        "Dr. T. Vigneshwar, MBBS, MD",
+                        "Dr. S. Malathi, MBBS, MD"
+                    ])
+
+                if consultation_mode == "Fresh Teleconsultation":
+                    p_details = st.text_area("6. Chief Complaints / Symptoms *:", placeholder="e.g. Having fever and body pain for past 2 days...")
+                else:
+                    p_details = st.selectbox("6. Specific Focus Area *:", [
+                        "Diet Advice & DASH Diet Plan",
+                        "Diabetes & HTN Management",
+                        "Drugs Action & Safety Clarifications",
+                        "CT / MRI Scan Opinion",
+                        "Blood Test / Lab Report Review",
+                        "Heart & Kidney Care Guidance"
+                    ])
+
+                st.info("💡 **Don't have an ABHA ID?** ABHA ID helps link all your medical records digitally across India. You can create your free ABHA ID instantly at [abha.abdm.gov.in](https://abha.abdm.gov.in/).")
+
+                wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_id_proof, p_abha, p_details, p_pref_doc, "English")
+
+                st.markdown(f'''
+                    <br>
+                    <a href="{wa_custom_url}" target="_blank" class="btn-wa" style="font-size: 17px;">
+                        💬 Submit Form & Launch WhatsApp Consultation Request (Fee: {CONSULTATION_FEE})
+                    </a>
+                    <p style="font-size:11.5px; color:#64748b; text-align:center; margin-top:8px;">🔒 Data strictly encrypted & processed as per DPDP Act 2023 and NMC Regulations.</p>
+                    </div>
+                ''', unsafe_allow_html=True)
+
+            st.markdown("---")
+
+            # FAQs
             if selected_lang == "தமிழ் (Tamil)":
-                st.markdown("""
-                    <h4 style="color:#0b3c5d; margin:5px 0 2px 0;">Dr. S. Malathi</h4>
-                    <p style="font-size:12px; color:#475569; margin-bottom:8px;">MBBS, MD General Medicine</p>
-                    <b style="color:#0284c7; font-size:15px;">🔵 2. இரண்டாம் கட்ட ஆலோசனை</b>
-                    <p style="font-size:12px; color:#57534e; margin-top:4px;">இரத்தப் பரிசோதனை, ஸ்கேன் ரிப்போர்ட் மற்றும் மருந்துப் பாதுகாப்பு ஆய்வுக்கு.</p>
-                """, unsafe_allow_html=True)
-                if st.button("இது தேவை (Select Second Opinion)", key="btn_second", type="primary" if is_second else "secondary"):
-                    st.session_state.selected_consultation_mode = "Second Opinion"
-                    st.rerun()
+                st.subheader("❓ அடிக்கடி கேட்கப்படும் கேள்விகள் (FAQs)")
+                with st.expander("1. எனது இரத்தப் பரிசோதனை அல்லது ஸ்கேன் அறிக்கைகளை எவ்வாறு அனுப்புவது?"):
+                    st.write("மேலே உள்ள வாட்ஸ்அப் பொத்தானைக் கிளிக் செய்த பிறகு, உங்கள் அறிக்கைகளின் புகைப்படங்கள் அல்லது PDF கோப்புகளை வாட்ஸ்அப் அரட்டையிலேயே நேரடியாக இணைக்கலாம்.")
+                with st.expander("2. மருத்துவரின் ஆலோசனையை நான் எப்போது பெறுவேன்?"):
+                    st.write("காலை 9:00 மணி முதல் மாலை 3:00 மணி வரை பெறப்படும் அறிக்கைகள், எங்கள் தினசரி மருத்துவர் பரிசீலனை நேரமான மாலை 4:00 மணி முதல் 6:00 மணிக்குள் ஆய்வு செய்யப்படும்.")
             else:
-                st.markdown("""
-                    <h4 style="color:#0b3c5d; margin:5px 0 2px 0;">Dr. S. Malathi</h4>
-                    <p style="font-size:12px; color:#475569; margin-bottom:8px;">MBBS, MD General Medicine</p>
-                    <b style="color:#0284c7; font-size:15px;">🔵 2. Second Opinion</b>
-                    <p style="font-size:12px; color:#57534e; margin-top:4px;">For blood test reviews, scan report evaluations, and drug safety checks.</p>
-                """, unsafe_allow_html=True)
-                if st.button("Select Second Opinion", key="btn_second", type="primary" if is_second else "secondary"):
-                    st.session_state.selected_consultation_mode = "Second Opinion"
-                    st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
+                st.subheader("❓ Frequently Asked Questions (FAQs)")
+                with st.expander("1. How do I upload my blood or scan reports?"):
+                    st.write("After clicking the WhatsApp button above, attach report photos/PDFs directly in our WhatsApp chat.")
+                with st.expander("2. When will I receive the Doctor's second opinion?"):
+                    st.write("Reports received between 9:00 AM and 3:00 PM are analyzed during our daily MD Doctor Review Window from 4:00 PM to 6:00 PM.")
 
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # Form Section
-        consultation_mode = st.session_state.selected_consultation_mode
-
-        if selected_lang == "தமிழ் (Tamil)":
-            st.markdown(f"""
-                <div style="background: #ffffff; border: 2px solid #0b3c5d; padding: 25px; border-radius: 16px;">
-                    <h3 style="color: #0b3c5d !important; margin-top: 0;">📋 நோயாளி விவரங்கள் படிவம் ({consultation_mode})</h3>
-                    <p style="font-size: 13px; color: #57534e;">உங்கள் விவரங்களை கீழே நிரப்பவும். இவை தானாகவே வாட்ஸ்அப் செய்தியாக மாறும்.</p>
-            """, unsafe_allow_html=True)
-
-            f_col1, f_col2, f_col3 = st.columns(3)
-            with f_col1:
-                p_name = st.text_input("1. முழு பெயர் *", placeholder="எ.கா. ரமேஷ் குமார்")
-            with f_col2:
-                p_age = st.number_input("2. வயது *", min_value=1, max_value=110, value=35)
-            with f_col3:
-                p_gender = st.selectbox("3. பாலினம் *", ["ஆண்", "பெண்", "மற்றவை"])
-
-            f_col4, f_col5 = st.columns(2)
-            with f_col4:
-                p_city = st.text_input("4. ஊர் / மாவட்டம் *", placeholder="எ.கா. திருச்சி / சென்னை")
-            with f_col5:
-                p_abha = st.text_input("5. ABHA ID / முகவரி (விருப்பமிருந்தால்):", placeholder="எ.கா. 12-3456-7890-1234 அல்லது name@abdm")
-
-            p_service = st.selectbox("6. ஆலோசனை தேவைப்படும் பகுதி *", [
-                "உணவுப் பழக்க வழக்கம் (DASH Diet & Diabetic Diet)",
-                "சர்க்கரை & ரத்த அழுத்த மேலாண்மை (Diabetes & HTN)",
-                "இதயம் & சிறுநீரக பாதுகாப்பு (Drug Dosage Monitoring)",
-                "தடுப்பூசி வழிகாட்டுதல் (Vaccination Guidance)",
-                "பரிவுப் பராமரிப்பு (Palliative Care)",
-                "நாள்பட்ட வலி மேலாண்மை (Chronic Pain)",
-                "இரத்த பரிசோதனை அறிக்கை ஆய்வு (Lab Report Review)",
-                "ஸ்கேன் அறிக்கை ஆய்வு (CT / MRI Scan Opinion)"
-            ])
-
-            p_notes = st.text_area("7. அறிகுறிகள் அல்லது மருத்துவ கேள்விகள்:", placeholder="எ.கா. சர்க்கரை அளவு மற்றும் மாத்திரை அளவு பற்றி கேட்க வேண்டும்...")
-            p_link = st.text_input("8. ஸ்கேன் / ரிப்போர்ட் லிங்க் (விருப்பமிருந்தால்):", placeholder="https://drive.google.com/...")
-
-            st.info("💡 **ABHA ID இல்லையா?** டிஜிட்டல் முறையில் உங்கள் மருத்துவ பதிவுகளை இணைக்க ABHA ID உதவுகிறது. இலவசமாக [abha.abdm.gov.in](https://abha.abdm.gov.in/) தளத்தில் உருவாக்கலாம்.")
-
-            wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_abha, p_service, p_notes, p_link, "தமிழ் (Tamil)")
-
-            st.markdown(f'''
-                <br>
-                <a href="{wa_custom_url}" target="_blank" class="btn-wa" style="font-size: 17px;">
-                    💬 படிவத்தை சமர்ப்பித்து வாட்ஸ்அப்பில் தொடங்கவும் (கட்டணம்: {CONSULTATION_FEE})
-                </a>
-                <p style="font-size:11.5px; color:#64748b; text-align:center; margin-top:8px;">🔒 DPDP Act 2023 & NMC விதிகள் படி உங்கள் தகவல்கள் பாதுகாப்பாகப் பராமரிக்கப்படும்.</p>
-                </div>
-            ''', unsafe_allow_html=True)
-
-        else:
-            st.markdown(f"""
-                <div style="background: #ffffff; border: 2px solid #0b3c5d; padding: 25px; border-radius: 16px;">
-                    <h3 style="color: #0b3c5d !important; margin-top: 0; font-size: 22px;">📋 Patient Details & Consultation Form ({consultation_mode})</h3>
-                    <p style="font-size: 13px; color: #57534e;">Please fill out your details below. These will be formatted and pre-filled into WhatsApp automatically.</p>
-            """, unsafe_allow_html=True)
-
-            f_col1, f_col2, f_col3 = st.columns(3)
-            with f_col1:
-                p_name = st.text_input("1. Full Name *", placeholder="e.g. Ramesh Kumar")
-            with f_col2:
-                p_age = st.number_input("2. Age *", min_value=1, max_value=110, value=35)
-            with f_col3:
-                p_gender = st.selectbox("3. Gender *", ["Male", "Female", "Other"])
-
-            f_col4, f_col5 = st.columns(2)
-            with f_col4:
-                p_city = st.text_input("4. City / Location *", placeholder="e.g. Trichy / Chennai")
-            with f_col5:
-                p_abha = st.text_input("5. ABHA ID / Address (Optional):", placeholder="e.g. 12-3456-7890-1234 or name@abdm")
-
-            p_service = st.selectbox("6. Focus Area *", [
-                "Diet Advice (DASH Diet & Diabetic Diet)",
-                "Diabetic & HTN Management",
-                "Heart & Kidney Care (Drug Dosage Monitoring)",
-                "Vaccination Doubts & Schedule Guidance",
-                "Palliative Care & Comfort Support",
-                "Chronic Pain Management",
-                "Lab & Blood Report Review",
-                "CT / MRI Scan Second Opinion"
-            ])
-
-            p_notes = st.text_area("7. Describe Your Symptoms or Clinical Questions:", placeholder="e.g. Want advice on diabetic diet plan and HbA1c report review. Currently taking Metformin 500mg...")
-            p_link = st.text_input("8. Google Drive / Scan Report Link (Optional):", placeholder="https://drive.google.com/...")
-
-            st.info("💡 **Don't have an ABHA ID?** ABHA ID helps link all your medical records digitally across India. You can create your free ABHA ID instantly at [abha.abdm.gov.in](https://abha.abdm.gov.in/).")
-
-            wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_abha, p_service, p_notes, p_link, "English")
-
-            st.markdown(f'''
-                <br>
-                <a href="{wa_custom_url}" target="_blank" class="btn-wa" style="font-size: 17px;">
-                    💬 Submit Form & Launch WhatsApp Consultation Request (Fee: {CONSULTATION_FEE})
-                </a>
-                <p style="font-size:11.5px; color:#64748b; text-align:center; margin-top:8px;">🔒 Data strictly encrypted & processed as per DPDP Act 2023 and NMC Regulations.</p>
-                </div>
-            ''', unsafe_allow_html=True)
-
-        st.markdown("---")
-
-        # FAQs
-        if selected_lang == "தமிழ் (Tamil)":
-            st.subheader("❓ அடிக்கடி கேட்கப்படும் கேள்விகள் (FAQs)")
-            with st.expander("1. எனது இரத்தப் பரிசோதனை அல்லது ஸ்கேன் அறிக்கைகளை எவ்வாறு அனுப்புவது?"):
-                st.write("மேலே உள்ள வாட்ஸ்அப் பொத்தானைக் கிளிக் செய்த பிறகு, உங்கள் அறிக்கைகளின் புகைப்படங்கள் அல்லது PDF கோப்புகளை வாட்ஸ்அப் அரட்டையிலேயே நேரடியாக இணைக்கலாம்.")
-            with st.expander("2. மருத்துவரின் ஆலோசனையை நான் எப்போது பெறுவேன்?"):
-                st.write("காலை 9:00 மணி முதல் மாலை 3:00 மணி வரை பெறப்படும் அறிக்கைகள், எங்கள் தினசரி மருத்துவர் பரிசீலனை நேரமான மாலை 4:00 மணி முதல் 6:00 மணிக்குள் ஆய்வு செய்யப்படும்.")
-        else:
-            st.subheader("❓ Frequently Asked Questions (FAQs)")
-            with st.expander("1. How do I upload my blood or scan reports?"):
-                st.write("After clicking the WhatsApp button above, attach report photos/PDFs directly in our WhatsApp chat.")
-            with st.expander("2. When will I receive the Doctor's second opinion?"):
-                st.write("Reports received between 9:00 AM and 3:00 PM are analyzed during our daily MD Doctor Review Window from 4:00 PM to 6:00 PM.")
-
-        st.markdown("---")
-        
-        # UPI Payment
-        st.subheader("💳 Instant ₹100 Payment Portal")
-        pay_col1, pay_col2 = st.columns([1, 2])
-        
-        with pay_col1:
-            st.image(get_upi_qr_url(), caption="Scan using GPay / PhonePe / Paytm", width=200)
+            st.markdown("---")
             
-        with pay_col2:
-            st.markdown(f"""
-                <div class="warm-card">
-                    <p style="margin-top: 0;"><b>Official Clinic UPI ID:</b> <code style="font-size: 16px; color: #0b3c5d; background: #fffbeb; padding: 4px 8px; border-radius: 6px;">{UPI_ID}</code></p>
-                    <p><b>Fee:</b> ₹100 Only</p>
-                    <p><b>Official Contact / WhatsApp:</b> +91 94868 72627</p>
-                    <p style="font-size: 13px; color: #57534e !important; margin-bottom: 0;">
-                        📌 <i>Once payment is completed, please share a screenshot of the confirmation in WhatsApp along with your health reports.</i>
-                    </p>
-                </div>
-            """, unsafe_allow_html=True)
+            # UPI Payment
+            st.subheader("💳 Instant ₹100 Payment Portal")
+            pay_col1, pay_col2 = st.columns([1, 2])
+            
+            with pay_col1:
+                st.image(get_upi_qr_url(), caption="Scan using GPay / PhonePe / Paytm", width=200)
+                
+            with pay_col2:
+                st.markdown(f"""
+                    <div class="warm-card">
+                        <p style="margin-top: 0;"><b>Official Clinic UPI ID:</b> <code style="font-size: 16px; color: #0b3c5d; background: #fffbeb; padding: 4px 8px; border-radius: 6px;">{UPI_ID}</code></p>
+                        <p><b>Fee:</b> ₹100 Only</p>
+                        <p><b>Official Contact / WhatsApp:</b> +91 94868 72627</p>
+                        <p style="font-size: 13px; color: #57534e !important; margin-bottom: 0;">
+                            📌 <i>Once payment is completed, please share a screenshot of the confirmation in WhatsApp along with your health reports.</i>
+                        </p>
+                    </div>
+                """, unsafe_allow_html=True)
 
     # TAB 2: Specialty Services
     with tab2:
@@ -784,25 +775,26 @@ else:
                     age = st.number_input("2. Age", min_value=0, max_value=120, value=25)
                     gender = st.selectbox("3. Gender", ["Male", "Female", "Other"])
                     phone = st.text_input("4. Contact Number")
-                    address = st.text_area("5. Address", height=80)
-                    doc_abha = st.text_input("6. ABHA Number / Address (Optional)", placeholder="12-3456-7890-1234")
+                    address = st.text_area("5. Address / Place", height=80)
+                    doc_id_proof = st.text_input("6. ID Card Details", placeholder="Aadhaar / Voter ID")
+                    doc_abha = st.text_input("7. ABHA Number / Address (Optional)", placeholder="12-3456-7890-1234")
                 with col2:
-                    consultation_type = st.selectbox("7. Consultation Focus", [
+                    consultation_type = st.selectbox("8. Consultation Focus", [
                         "Second Opinion (Report Review)",
                         "Drug / Medication Clarification",
                         "Diet & Nutrition Planning",
                         "Disease Progression Tracker",
                         "General Medical Consultation"
                     ])
-                    preferred_slot = st.selectbox("8. Review Time Slot", [
+                    preferred_slot = st.selectbox("9. Review Time Slot", [
                         "4:00 PM - 4:30 PM",
                         "4:30 PM - 5:00 PM",
                         "5:00 PM - 5:30 PM",
                         "5:30 PM - 6:00 PM"
                     ])
-                    followup_date = st.date_input("9. Follow-Up Date")
+                    followup_date = st.date_input("10. Follow-Up Date")
                     
-                    st.markdown("<b>10. Patient Vitals:</b>", unsafe_allow_html=True)
+                    st.markdown("<b>11. Patient Vitals:</b>", unsafe_allow_html=True)
                     v_col1, v_col2, v_col3, v_col4 = st.columns(4)
                     bp = v_col1.text_input("BP", placeholder="120/80")
                     pulse = v_col2.text_input("Pulse", placeholder="72")
@@ -812,12 +804,12 @@ else:
                 st.markdown("---")
                 col_c1, col_c2 = st.columns(2)
                 with col_c1:
-                    complaints = st.text_area("11. Chief Complaints / Symptoms", height=100)
-                    investigation = st.text_area("12. Lab Reports & Scans Review", height=100)
+                    complaints = st.text_area("12. Chief Complaints / Symptoms", height=100)
+                    investigation = st.text_area("13. Lab Reports & Scans Review", height=100)
                 with col_c2:
-                    treatment_history = st.text_area("13. Clinical Advice / Notes", height=100)
+                    treatment_history = st.text_area("14. Clinical Advice / Notes", height=100)
                     prescription_details = st.text_area(
-                        "14. Digital E-Prescription (Drug | Dosage | Duration | Instruction) - WRITE IN CAPITAL LETTERS", 
+                        "15. Digital E-Prescription (Drug | Dosage | Duration | Instruction) - WRITE IN CAPITAL LETTERS", 
                         placeholder="1. TAB PARACETAMOL 650MG | 1-0-1 | 5 days | After Food",
                         height=100
                     )
@@ -830,20 +822,20 @@ else:
                             entry_date, patient_name, age, gender, phone, address, 
                             bp, pulse, spo2, temp, complaints, investigation, 
                             treatment_history, prescription_details, consultation_type, 
-                            preferred_slot, followup_date, abha_id
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            preferred_slot, followup_date, abha_id, id_card_details, preferred_doctor
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ''', (
                         entry_time, patient_name, age, gender, phone, address,
                         bp, pulse, spo2, temp, complaints, investigation,
                         treatment_history, prescription_details, consultation_type,
-                        preferred_slot, str(followup_date), doc_abha
+                        preferred_slot, str(followup_date), doc_abha, doc_id_proof, authenticated_doctor_1
                     ))
                     conn.commit()
                     st.success(f"Record successfully saved for {patient_name}!")
         elif pin_input_1:
             st.error("Incorrect Passcode.")
 
-    # 🌟 TAB 5: DATABASE & OFFICIAL PRINTABLE LOGO E-PRESCRIPTION PAD 🌟
+    # TAB 5: DATABASE & OFFICIAL PRINTABLE LOGO E-PRESCRIPTION PAD
     with tab5:
         st.subheader("🔒 Doctor Internal Portal")
         pin_input_2 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin2")
@@ -862,10 +854,9 @@ else:
                 selected_id = st.selectbox("Select Patient ID to view Official Rx Pad:", df_filtered['patient_id'].tolist())
                 patient_row = df_filtered[df_filtered['patient_id'] == selected_id].iloc[0]
 
-                # 🌟 LOGO HEADER IN E-PRESCRIPTION PAD 🌟
+                # LOGO HEADER IN E-PRESCRIPTION PAD
                 st.markdown('<div class="rx-container">', unsafe_allow_html=True)
                 
-                # Check for logo image
                 logo_files = ["welcome_poster.png", "117482.png", "doc_vigneshwar.png"]
                 logo_found = False
                 for lf in logo_files:
@@ -879,7 +870,7 @@ else:
                         <h1 style="color: #0b3c5d !important; margin: 0; font-size: 26px; font-weight: 800;">N2 CARE TELECLINIC</h1>
                         <p style="margin: 3px 0; color: #bc6c25; font-style: italic; font-weight: 700; font-size: 14px;">"Your Friendly Second Opinion"</p>
                         <p style="margin: 2px 0; font-size: 12.5px; color: #334155;">
-                            <b>Dr. Vigneshwar</b>, MBBS, MD General Medicine (TNMC Reg No: 159693)<br/>
+                            <b>Dr. T. Vigneshwar</b>, MBBS, MD General Medicine (TNMC Reg No: 159693)<br/>
                             <b>Dr. S. Malathi</b>, MBBS, MD General Medicine
                         </p>
                         <small style="color: #64748b;">Official WhatsApp: +91 94868 72627 | UPI ID: 9486872627@upi</small>
@@ -893,7 +884,8 @@ else:
                             <td style="padding: 8px; border: 1px solid #cbd5e1;"><b>Date:</b> {patient_row['entry_date']}</td>
                         </tr>
                         <tr>
-                            <td colspan="2" style="padding: 8px; border: 1px solid #cbd5e1;"><b>ABHA ID:</b> {patient_row['abha_id'] if 'abha_id' in patient_row and patient_row['abha_id'] else 'Not Provided'}</td>
+                            <td style="padding: 8px; border: 1px solid #cbd5e1;"><b>ID Proof:</b> {patient_row['id_card_details'] if 'id_card_details' in patient_row and patient_row['id_card_details'] else 'Not Provided'}</td>
+                            <td style="padding: 8px; border: 1px solid #cbd5e1;"><b>ABHA ID:</b> {patient_row['abha_id'] if 'abha_id' in patient_row and patient_row['abha_id'] else 'Not Provided'}</td>
                             <td colspan="2" style="padding: 8px; border: 1px solid #cbd5e1;"><b>Vitals:</b> BP: {patient_row['bp']} | Pulse: {patient_row['pulse']} | SpO2: {patient_row['spo2']} | Temp: {patient_row['temp']}</td>
                         </tr>
                     </table>
@@ -919,7 +911,7 @@ else:
                             🔒 Data encrypted as per Digital Personal Data Protection (DPDP) Act 2023.
                         </div>
                         <div style="text-align: right;">
-                            <p style="margin:0; font-weight:800; color:#0b3c5d; font-size:14px;">Dr. Vigneshwar / Dr. S. Malathi</p>
+                            <p style="margin:0; font-weight:800; color:#0b3c5d; font-size:14px;">Dr. T. Vigneshwar / Dr. S. Malathi</p>
                             <small style="color:#64748b;">Digitally Signed & Verified RMP</small>
                         </div>
                     </div>
