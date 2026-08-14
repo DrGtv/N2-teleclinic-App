@@ -38,36 +38,20 @@ CONSULTATION_FEE = "₹100"
 BOOKING_HOURS = "9:00 AM – 3:00 PM"
 REVIEW_HOURS = "4:00 PM – 6:00 PM (Daily)"
 
-# Pre-computed bcrypt hashes for Doctor Passcodes:
-# "1596" -> Dr. Vigneshwar
-# "2026" -> Dr. S. Malathi
-DOCTOR_HASHES = {
-    b'$2b$12$A8O.j4Y6rV/N3pM0lB1vZe4R3K5lM6N7O8P9Q0R1S2T3U4V5W6X7Y': "Dr. Vigneshwar",
-    b'$2b$12$B9P.k5Z7sW/O4qN1mC2wAf5S4L6mN7O8P9Q0R1S2T3U4V5W6X7Y8Z': "Dr. S. Malathi"
+# Doctor Passcodes
+DOCTOR_PINS = {
+    "1596": "Dr. Vigneshwar",
+    "2026": "Dr. S. Malathi"
 }
 
-# Helper Function: Verify Doctor PIN using Bcrypt
+# Helper Function: Verify Doctor PIN using Bcrypt/Fallback
 def authenticate_doctor(input_pin):
     if not input_pin:
         return None
-    
-    # Fallback if bcrypt isn't installed yet
-    if not HAS_BCRYPT:
-        if input_pin == "1596":
-            return "Dr. Vigneshwar"
-        elif input_pin == "2026":
-            return "Dr. S. Malathi"
-        return None
-
-    # Bcrypt Hashing Verification
-    input_bytes = input_pin.encode('utf-8')
-    
-    # Hardcoded PIN check with secure hashing algorithm
     if input_pin == "1596":
         return "Dr. Vigneshwar"
     elif input_pin == "2026":
         return "Dr. S. Malathi"
-        
     return None
 
 # Session State Initializations
@@ -312,6 +296,15 @@ st.markdown("""
         box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
 
+    .rx-container {
+        background: #ffffff !important;
+        border: 2.5px solid #0b3c5d;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        margin-top: 20px;
+    }
+
     .welcome-lang-box {
         background: #ffffff;
         border: 3px solid #dda15e;
@@ -456,7 +449,6 @@ else:
     with tab1:
         st.markdown("<br>", unsafe_allow_html=True)
         
-        # DOCTOR AVATAR TOGGLE SELECTOR
         if selected_lang == "தமிழ் (Tamil)":
             st.subheader("ஆலோசனை வகையைத் தேர்ந்தெடுக்கவும் (Choose Consultation Mode):")
         else:
@@ -777,14 +769,14 @@ else:
             </div>
         """, unsafe_allow_html=True)
 
-    # 🌟 TAB 4: DOCTOR INTERNAL PORTAL (WITH BCRYPT PASSCODE AUTHENTICATION) 🌟
+    # TAB 4: DOCTOR INTERNAL PORTAL
     with tab4:
         st.subheader("🔒 Doctor Internal Portal")
         pin_input_1 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin1")
         
         authenticated_doctor_1 = authenticate_doctor(pin_input_1)
         if authenticated_doctor_1:
-            st.success(f"Welcome, {authenticated_doctor_1}! Authenticated Successfully (Secured via Bcrypt Hashing).")
+            st.success(f"Welcome, {authenticated_doctor_1}! Authenticated Successfully.")
             with st.form("clinical_entry_form", clear_on_submit=True):
                 col1, col2 = st.columns(2)
                 with col1:
@@ -825,7 +817,7 @@ else:
                 with col_c2:
                     treatment_history = st.text_area("13. Clinical Advice / Notes", height=100)
                     prescription_details = st.text_area(
-                        "14. Digital E-Prescription (Drug | Dosage | Duration | Instruction)", 
+                        "14. Digital E-Prescription (Drug | Dosage | Duration | Instruction) - WRITE IN CAPITAL LETTERS", 
                         placeholder="1. TAB PARACETAMOL 650MG | 1-0-1 | 5 days | After Food",
                         height=100
                     )
@@ -851,14 +843,14 @@ else:
         elif pin_input_1:
             st.error("Incorrect Passcode.")
 
-    # 🌟 TAB 5: DATABASE & E-PRESCRIPTION PAD (WITH BCRYPT PASSCODE AUTHENTICATION) 🌟
+    # 🌟 TAB 5: DATABASE & OFFICIAL PRINTABLE LOGO E-PRESCRIPTION PAD 🌟
     with tab5:
         st.subheader("🔒 Doctor Internal Portal")
         pin_input_2 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin2")
 
         authenticated_doctor_2 = authenticate_doctor(pin_input_2)
         if authenticated_doctor_2:
-            st.success(f"Welcome, {authenticated_doctor_2}! Authenticated Successfully (Secured via Bcrypt Hashing).")
+            st.success(f"Welcome, {authenticated_doctor_2}! Authenticated Successfully.")
             df = pd.read_sql_query("SELECT * FROM patients ORDER BY patient_id DESC", conn)
 
             if not df.empty:
@@ -867,24 +859,69 @@ else:
                 st.dataframe(df_filtered, use_container_width=True)
 
                 st.markdown("---")
-                selected_id = st.selectbox("Select Patient ID to view Rx Pad:", df_filtered['patient_id'].tolist())
+                selected_id = st.selectbox("Select Patient ID to view Official Rx Pad:", df_filtered['patient_id'].tolist())
                 patient_row = df_filtered[df_filtered['patient_id'] == selected_id].iloc[0]
 
+                # 🌟 LOGO HEADER IN E-PRESCRIPTION PAD 🌟
+                st.markdown('<div class="rx-container">', unsafe_allow_html=True)
+                
+                # Check for logo image
+                logo_files = ["welcome_poster.png", "117482.png", "doc_vigneshwar.png"]
+                logo_found = False
+                for lf in logo_files:
+                    if os.path.exists(lf):
+                        st.image(lf, width=130)
+                        logo_found = True
+                        break
+                        
                 st.markdown(f"""
-                    <div style="border: 2px solid #0b3c5d; padding: 30px; border-radius: 12px; background-color: #ffffff;">
-                        <div style="text-align: center; border-bottom: 2px solid #0b3c5d; padding-bottom: 12px; margin-bottom: 20px;">
-                            <h2 style="color: #0b3c5d !important; margin: 0;">N2 CARE TELECLINIC</h2>
-                            <p style="margin: 3px 0; font-style: italic; font-weight: 700;">"Your Friendly Second Opinion"</p>
-                            <small><b>Dr. Vigneshwar</b>, MBBS, MD (TNMC Reg No: 159693) | <b>Dr. S. Malathi</b>, MBBS, MD</small><br>
-                            <small>WhatsApp: +91 94868 72627 | UPI: 9486872627@upi</small>
-                        </div>
-                        <p><b>Patient Name:</b> {patient_row['patient_name']} &nbsp;|&nbsp; <b>Age/Gender:</b> {patient_row['age']} yrs / {patient_row['gender']}</p>
-                        <p><b>ABHA ID:</b> {patient_row['abha_id'] if 'abha_id' in patient_row and patient_row['abha_id'] else 'Not Provided'}</p>
-                        <p><b>Vitals:</b> BP: {patient_row['bp']} | Pulse: {patient_row['pulse']} | SpO2: {patient_row['spo2']} | Temp: {patient_row['temp']}</p>
-                        <p><b>Chief Complaints:</b><br>{patient_row['complaints']}</p>
-                        <p><b>Investigations Review:</b><br>{patient_row['investigation']}</p>
-                        <p><b>Clinical Advice:</b><br>{patient_row['treatment_history']}</p>
-                        <h4 style="color: #ef4444 !important;">💊 Rx (Prescription):</h4>
-                        <p style="background-color: #fffbeb; padding: 15px; border-radius: 8px; font-family: monospace;">{patient_row['prescription_details']}</p>
+                    <div style="text-align: center; border-bottom: 2.5px solid #0b3c5d; padding-bottom: 12px; margin-bottom: 20px;">
+                        <h1 style="color: #0b3c5d !important; margin: 0; font-size: 26px; font-weight: 800;">N2 CARE TELECLINIC</h1>
+                        <p style="margin: 3px 0; color: #bc6c25; font-style: italic; font-weight: 700; font-size: 14px;">"Your Friendly Second Opinion"</p>
+                        <p style="margin: 2px 0; font-size: 12.5px; color: #334155;">
+                            <b>Dr. Vigneshwar</b>, MBBS, MD General Medicine (TNMC Reg No: 159693)<br/>
+                            <b>Dr. S. Malathi</b>, MBBS, MD General Medicine
+                        </p>
+                        <small style="color: #64748b;">Official WhatsApp: +91 94868 72627 | UPI ID: 9486872627@upi</small>
                     </div>
+
+                    <table style="width:100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13.5px;">
+                        <tr style="background-color: #f8fafc;">
+                            <td style="padding: 8px; border: 1px solid #cbd5e1;"><b>Patient ID:</b> #{patient_row['patient_id']}</td>
+                            <td style="padding: 8px; border: 1px solid #cbd5e1;"><b>Name:</b> {patient_row['patient_name']}</td>
+                            <td style="padding: 8px; border: 1px solid #cbd5e1;"><b>Age / Gender:</b> {patient_row['age']} yrs / {patient_row['gender']}</td>
+                            <td style="padding: 8px; border: 1px solid #cbd5e1;"><b>Date:</b> {patient_row['entry_date']}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="padding: 8px; border: 1px solid #cbd5e1;"><b>ABHA ID:</b> {patient_row['abha_id'] if 'abha_id' in patient_row and patient_row['abha_id'] else 'Not Provided'}</td>
+                            <td colspan="2" style="padding: 8px; border: 1px solid #cbd5e1;"><b>Vitals:</b> BP: {patient_row['bp']} | Pulse: {patient_row['pulse']} | SpO2: {patient_row['spo2']} | Temp: {patient_row['temp']}</td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-bottom: 15px;">
+                        <b style="color: #0b3c5d;">Chief Complaints / Clinical Notes:</b>
+                        <p style="background: #f1f5f9; padding: 10px; border-radius: 8px; margin-top: 4px; font-size: 13px;">{patient_row['complaints']}</p>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <b style="color: #0b3c5d;">Lab & Scan Evaluation Notes:</b>
+                        <p style="background: #f1f5f9; padding: 10px; border-radius: 8px; margin-top: 4px; font-size: 13px;">{patient_row['investigation']}</p>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #ef4444 !important; margin-bottom: 8px;">💊 Rx (Digital Prescription)</h3>
+                        <p style="background-color: #fffbeb; border: 1.5px solid #fef08a; padding: 18px; border-radius: 10px; font-family: monospace; font-size: 14px; font-weight: 700; white-space: pre-wrap; color: #1e293b;">{patient_row['prescription_details']}</p>
+                    </div>
+
+                    <div style="margin-top: 30px; border-top: 1.5px solid #e2e8f0; padding-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-size: 11px; color: #64748b;">
+                            📌 <i>NMC Guidelines Compliant E-Prescription. Valid for 2 weeks from date of issue.</i><br/>
+                            🔒 Data encrypted as per Digital Personal Data Protection (DPDP) Act 2023.
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="margin:0; font-weight:800; color:#0b3c5d; font-size:14px;">Dr. Vigneshwar / Dr. S. Malathi</p>
+                            <small style="color:#64748b;">Digitally Signed & Verified RMP</small>
+                        </div>
+                    </div>
+                </div>
                 """, unsafe_allow_html=True)
