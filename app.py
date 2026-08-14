@@ -195,7 +195,7 @@ def get_detailed_whatsapp_url(mode, name, age, gender, city, id_proof, abha, det
         msg += f"👨‍⚕️ *7. விருப்பமான மருத்துவர்:* {pref_doc}\n"
         if bp or pulse or spo2 or temp:
             msg += f"📊 *சுய உடல் அளவீடுகள் (Vitals):* BP: {bp if bp else 'N/A'} | Pulse: {pulse if pulse else 'N/A'} | SpO2: {spo2 if spo2 else 'N/A'} | Temp: {temp if temp else 'N/A'}\n"
-        msg += f"🎁 *சலுகை:* 7 நாட்களுக்கு இலவச தொடர் ஆலோசனை (7-Day Free Follow-up)\n"
+        msg += f"🎁 *சிறப்புச் சலுகை:* 7 நாட்களுக்கு இலவச தொடர் ஆலோசனை (7-Day Free Follow-Up)\n"
         msg += f"🏷️ *கட்டணம்:* {CONSULTATION_FEE}\n"
         msg += f"━━━━━━━━━━━━━━━━━━━━━━\n"
         msg += f"📩 *குறிப்பு:* எனது இரத்த பரிசோதனை / ஸ்கேன் அறிக்கை / கட்டண ஸ்கிரீன்ஷாட்டை இதில் இணைக்கிறேன். மாலை {REVIEW_HOURS} மணிக்குள் பரிசீலிக்கவும்."
@@ -215,7 +215,7 @@ def get_detailed_whatsapp_url(mode, name, age, gender, city, id_proof, abha, det
         msg += f"👨‍⚕️ *7. Preferred Doctor:* {pref_doc}\n"
         if bp or pulse or spo2 or temp:
             msg += f"📊 *Self-Reported Vitals:* BP: {bp if bp else 'N/A'} | Pulse: {pulse if pulse else 'N/A'} | SpO2: {spo2 if spo2 else 'N/A'} | Temp: {temp if temp else 'N/A'}\n"
-        msg += f"🎁 *Benefit:* Includes 7-Day Free Follow-Up Window\n"
+        msg += f"🎁 *Special Benefit:* Includes 7-Day Free Follow-Up Window\n"
         msg += f"🏷️ *Fee:* {CONSULTATION_FEE}\n"
         msg += f"━━━━━━━━━━━━━━━━━━━━━━\n"
         msg += f"📩 *Note:* I am attaching my blood reports / scan photos / payment screenshot here. Please review between {REVIEW_HOURS}."
@@ -322,7 +322,7 @@ st.markdown("""
         margin-top: 15px;
     }
 
-    .badge-aster {
+    .badge-n2 {
         background: #fef08a;
         color: #854d0e;
         padding: 6px 12px;
@@ -480,7 +480,7 @@ else:
             # Option 1: Fresh Teleconsultation
             with doc_card1:
                 st.markdown('<div class="mode-selection-card">', unsafe_allow_html=True)
-                st.markdown('<span class="badge-aster">🎁 7 DAYS FREE FOLLOW-UP</span>', unsafe_allow_html=True)
+                st.markdown('<span class="badge-n2">🎁 7 DAYS FREE FOLLOW-UP</span>', unsafe_allow_html=True)
                 st.markdown('<div style="font-size: 55px; margin-bottom: 10px;">🟢</div>', unsafe_allow_html=True)
                 if selected_lang == "தமிழ் (Tamil)":
                     st.markdown("""
@@ -503,7 +503,7 @@ else:
             # Option 2: Second Opinion
             with doc_card2:
                 st.markdown('<div class="mode-selection-card">', unsafe_allow_html=True)
-                st.markdown('<span class="badge-aster">💊 REFILL & SCAN OPINION</span>', unsafe_allow_html=True)
+                st.markdown('<span class="badge-n2">💊 REFILL & SCAN OPINION</span>', unsafe_allow_html=True)
                 st.markdown('<div style="font-size: 55px; margin-bottom: 10px;">🔵</div>', unsafe_allow_html=True)
                 if selected_lang == "தமிழ் (Tamil)":
                     st.markdown("""
@@ -523,7 +523,7 @@ else:
                     st.button("Select Second Opinion", key="btn_second", type="primary", use_container_width=True, on_click=set_consultation_mode, args=("Second Opinion",))
                 st.markdown('</div>', unsafe_allow_html=True)
 
-        # 🌟 STEP 2: OPEN FORM AFTER TAB CLICK (Strictly containing 7 fields + Vitals) 🌟
+        # 🌟 STEP 2: OPEN FORM AFTER TAB CLICK 🌟
         else:
             consultation_mode = st.session_state.selected_consultation_mode
 
@@ -575,7 +575,7 @@ else:
                         "இதயம் & சிறுநீரகப் பாதுகாப்பு (Heart & Kidney Care)"
                     ])
 
-                # Optional Vitals Collection (Aster Clinic Feature)
+                # Optional Vitals Collection
                 with st.expander("🩺 வீட்டில் சுய பரிசோதனை அளவீடுகள் (Self-Reported Vitals - Optional)"):
                     v_col1, v_col2, v_col3, v_col4 = st.columns(4)
                     p_bp = v_col1.text_input("BP (ரத்த அழுத்தம்)", placeholder="120/80")
@@ -583,7 +583,7 @@ else:
                     p_spo2 = v_col3.text_input("SpO2 %", placeholder="98%")
                     p_temp = v_col4.text_input("Temp (வெப்பநிலை)", placeholder="98.6 F")
 
-                st.success("🎁 **Aster Style Benefit:** இந்த ஆலோசனையுடன் 7 நாட்களுக்குள் சந்தேகங்கள் கேட்க **இலவசத் தொடர் ஆலோசனை (7-Day Free Follow-Up)** பொருந்தும்.")
+                st.success("🎁 **N2 Special Benefit:** இந்த ஆலோசனையுடன் 7 நாட்களுக்குள் சந்தேகங்கள் கேட்க **இலவசத் தொடர் ஆலோசனை (7-Day Free Follow-Up)** பொருந்தும்.")
 
                 wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_id_proof, p_abha, p_details, p_pref_doc, p_bp, p_pulse, p_spo2, p_temp, "தமிழ் (Tamil)")
 
@@ -640,7 +640,7 @@ else:
                         "Heart & Kidney Care Guidance"
                     ])
 
-                # Optional Vitals Collection (Aster Clinic Feature)
+                # Optional Vitals Collection
                 with st.expander("🩺 Self-Reported Home Vitals (Optional)"):
                     v_col1, v_col2, v_col3, v_col4 = st.columns(4)
                     p_bp = v_col1.text_input("BP", placeholder="120/80")
@@ -648,7 +648,7 @@ else:
                     p_spo2 = v_col3.text_input("SpO2 %", placeholder="98%")
                     p_temp = v_col4.text_input("Temp", placeholder="98.6 F")
 
-                st.success("🎁 **Aster Style Assurance:** Includes a **7-Day Free Follow-Up Window** for any prescription doubts or review queries.")
+                st.success("🎁 **N2 Care Assurance:** Includes a **7-Day Free Follow-Up Window** for any prescription doubts or review queries.")
 
                 wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_id_proof, p_abha, p_details, p_pref_doc, p_bp, p_pulse, p_spo2, p_temp, "English")
 
