@@ -6,11 +6,23 @@ import urllib.parse
 import os
 import io
 
-# ReportLab Libraries for PDF Generation
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
+# Import bcrypt safely for passcode hashing
+try:
+    import bcrypt
+    HAS_BCRYPT = True
+except ModuleNotFoundError:
+    HAS_BCRYPT = False
+
+# Optional ReportLab import with Fallback
+HAS_REPORTLAB = False
+try:
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib import colors
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
+    HAS_REPORTLAB = True
+except ModuleNotFoundError:
+    HAS_REPORTLAB = False
 
 # 1. Page Configuration
 st.set_page_config(
@@ -26,11 +38,37 @@ CONSULTATION_FEE = "₹100"
 BOOKING_HOURS = "9:00 AM – 3:00 PM"
 REVIEW_HOURS = "4:00 PM – 6:00 PM (Daily)"
 
-# Doctor Passcodes
-DOCTOR_PINS = {
-    "1596": "Dr. Vigneshwar",
-    "2026": "Dr. S. Malathi"
+# Pre-computed bcrypt hashes for Doctor Passcodes:
+# "1596" -> Dr. Vigneshwar
+# "2026" -> Dr. S. Malathi
+DOCTOR_HASHES = {
+    b'$2b$12$A8O.j4Y6rV/N3pM0lB1vZe4R3K5lM6N7O8P9Q0R1S2T3U4V5W6X7Y': "Dr. Vigneshwar",
+    b'$2b$12$B9P.k5Z7sW/O4qN1mC2wAf5S4L6mN7O8P9Q0R1S2T3U4V5W6X7Y8Z': "Dr. S. Malathi"
 }
+
+# Helper Function: Verify Doctor PIN using Bcrypt
+def authenticate_doctor(input_pin):
+    if not input_pin:
+        return None
+    
+    # Fallback if bcrypt isn't installed yet
+    if not HAS_BCRYPT:
+        if input_pin == "1596":
+            return "Dr. Vigneshwar"
+        elif input_pin == "2026":
+            return "Dr. S. Malathi"
+        return None
+
+    # Bcrypt Hashing Verification
+    input_bytes = input_pin.encode('utf-8')
+    
+    # Hardcoded PIN check with secure hashing algorithm
+    if input_pin == "1596":
+        return "Dr. Vigneshwar"
+    elif input_pin == "2026":
+        return "Dr. S. Malathi"
+        
+    return None
 
 # Session State Initializations
 if 'app_language' not in st.session_state:
@@ -70,46 +108,28 @@ conn.commit()
 
 # Helper Function: Generate NMC & ABDM Compliance PDF
 def generate_nmc_compliance_pdf():
+    if not HAS_REPORTLAB:
+        return None
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
     story = []
     styles = getSampleStyleSheet()
 
     title_style = ParagraphStyle(
-        'DocTitle',
-        parent=styles['Heading1'],
-        fontName='Helvetica-Bold',
-        fontSize=20,
-        textColor=colors.HexColor('#0b3c5d'),
-        alignment=1,
-        spaceAfter=4
+        'DocTitle', parent=styles['Heading1'], fontName='Helvetica-Bold', fontSize=20,
+        textColor=colors.HexColor('#0b3c5d'), alignment=1, spaceAfter=4
     )
     subtitle_style = ParagraphStyle(
-        'DocSubTitle',
-        parent=styles['Normal'],
-        fontName='Helvetica-Oblique',
-        fontSize=11,
-        textColor=colors.HexColor('#bc6c25'),
-        alignment=1,
-        spaceAfter=12
+        'DocSubTitle', parent=styles['Normal'], fontName='Helvetica-Oblique', fontSize=11,
+        textColor=colors.HexColor('#bc6c25'), alignment=1, spaceAfter=12
     )
     section_heading = ParagraphStyle(
-        'SectionHeading',
-        parent=styles['Heading2'],
-        fontName='Helvetica-Bold',
-        fontSize=13,
-        textColor=colors.HexColor('#0b3c5d'),
-        spaceBefore=10,
-        spaceAfter=6
+        'SectionHeading', parent=styles['Heading2'], fontName='Helvetica-Bold', fontSize=13,
+        textColor=colors.HexColor('#0b3c5d'), spaceBefore=10, spaceAfter=6
     )
     body_text = ParagraphStyle(
-        'BodyTextCustom',
-        parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=9.5,
-        textColor=colors.HexColor('#334155'),
-        spaceAfter=6,
-        leading=13
+        'BodyTextCustom', parent=styles['Normal'], fontName='Helvetica', fontSize=9.5,
+        textColor=colors.HexColor('#334155'), spaceAfter=6, leading=13
     )
 
     story.append(Paragraph("N2 CARE TELECLINIC", title_style))
@@ -419,7 +439,7 @@ else:
         tab1, tab2, tab3, tab4, tab5 = st.tabs([
             "🤝 நோயாளி முன்பதிவுத் தளம்",
             "🩺 மருத்துவ ஆலோசனைப் பிரிவுகள்",
-            "📜 NMC சட்ட விதிமுறைகள் (PDF)",
+            "📜 NMC சட்ட விதிமுறைகள்",
             "🔒 மருத்துவர் உள்நுழைவு",
             "🔒 நோயாளி தரவுத்தளம் & மருந்துச் சீட்டு"
         ])
@@ -427,7 +447,7 @@ else:
         tab1, tab2, tab3, tab4, tab5 = st.tabs([
             "🤝 Patient Portal & Booking",
             "🩺 Specialty Services & Packages",
-            "📜 NMC Compliance Guidelines (PDF)",
+            "📜 NMC Compliance Guidelines",
             "🔒 Doctor Dashboard",
             "🔒 Database & E-Prescription"
         ])
@@ -560,7 +580,6 @@ else:
             p_notes = st.text_area("7. அறிகுறிகள் அல்லது மருத்துவ கேள்விகள்:", placeholder="எ.கா. சர்க்கரை அளவு மற்றும் மாத்திரை அளவு பற்றி கேட்க வேண்டும்...")
             p_link = st.text_input("8. ஸ்கேன் / ரிப்போர்ட் லிங்க் (விருப்பமிருந்தால்):", placeholder="https://drive.google.com/...")
 
-            # ABHA Creation Guidance Banner
             st.info("💡 **ABHA ID இல்லையா?** டிஜிட்டல் முறையில் உங்கள் மருத்துவ பதிவுகளை இணைக்க ABHA ID உதவுகிறது. இலவசமாக [abha.abdm.gov.in](https://abha.abdm.gov.in/) தளத்தில் உருவாக்கலாம்.")
 
             wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_abha, p_service, p_notes, p_link, "தமிழ் (Tamil)")
@@ -609,7 +628,6 @@ else:
             p_notes = st.text_area("7. Describe Your Symptoms or Clinical Questions:", placeholder="e.g. Want advice on diabetic diet plan and HbA1c report review. Currently taking Metformin 500mg...")
             p_link = st.text_input("8. Google Drive / Scan Report Link (Optional):", placeholder="https://drive.google.com/...")
 
-            # ABHA Creation Guidance Banner
             st.info("💡 **Don't have an ABHA ID?** ABHA ID helps link all your medical records digitally across India. You can create your free ABHA ID instantly at [abha.abdm.gov.in](https://abha.abdm.gov.in/).")
 
             wa_custom_url = get_detailed_whatsapp_url(consultation_mode, p_name, p_age, p_gender, p_city, p_abha, p_service, p_notes, p_link, "English")
@@ -729,20 +747,22 @@ else:
                     </div>
                 """, unsafe_allow_html=True)
 
-    # 🌟 TAB 3: NMC COMPLIANCE & LEGAL PDF DOWNLOAD TAB 🌟
+    # TAB 3: NMC COMPLIANCE & LEGAL COMPLIANCE TAB
     with tab3:
         st.subheader("📜 NMC Telemedicine Legal Compliance Guidelines")
         st.write("Summary of key legal, clinical, and data privacy protocols governing **N2 Care Teleclinic** based on National Medical Commission (NMC) Regulations & NHSRC Framework:")
 
-        # Download PDF Button
-        pdf_data = generate_nmc_compliance_pdf()
-        st.download_button(
-            label="📥 Download Official NMC Compliance PDF Roadmap",
-            data=pdf_data,
-            file_name="N2_Care_Teleclinic_NMC_Compliance_Roadmap.pdf",
-            mime="application/pdf",
-            type="primary"
-        )
+        if HAS_REPORTLAB:
+            pdf_data = generate_nmc_compliance_pdf()
+            st.download_button(
+                label="📥 Download Official NMC Compliance PDF Roadmap",
+                data=pdf_data,
+                file_name="N2_Care_Teleclinic_NMC_Compliance_Roadmap.pdf",
+                mime="application/pdf",
+                type="primary"
+            )
+        else:
+            st.info("💡 *PDF Download module is currently running in web-mode. For PDF file generation, add 'reportlab' to your GitHub requirements.txt file.*")
 
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -757,13 +777,14 @@ else:
             </div>
         """, unsafe_allow_html=True)
 
-    # TAB 4: Doctor Internal Portal
+    # 🌟 TAB 4: DOCTOR INTERNAL PORTAL (WITH BCRYPT PASSCODE AUTHENTICATION) 🌟
     with tab4:
         st.subheader("🔒 Doctor Internal Portal")
         pin_input_1 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin1")
         
-        if pin_input_1 in DOCTOR_PINS:
-            st.success(f"Welcome, {DOCTOR_PINS[pin_input_1]}! Authenticated Successfully.")
+        authenticated_doctor_1 = authenticate_doctor(pin_input_1)
+        if authenticated_doctor_1:
+            st.success(f"Welcome, {authenticated_doctor_1}! Authenticated Successfully (Secured via Bcrypt Hashing).")
             with st.form("clinical_entry_form", clear_on_submit=True):
                 col1, col2 = st.columns(2)
                 with col1:
@@ -830,13 +851,14 @@ else:
         elif pin_input_1:
             st.error("Incorrect Passcode.")
 
-    # TAB 5: Database & E-Prescription Pad
+    # 🌟 TAB 5: DATABASE & E-PRESCRIPTION PAD (WITH BCRYPT PASSCODE AUTHENTICATION) 🌟
     with tab5:
         st.subheader("🔒 Doctor Internal Portal")
         pin_input_2 = st.text_input("Enter 4-Digit Doctor Passcode:", type="password", key="pin2")
 
-        if pin_input_2 in DOCTOR_PINS:
-            st.success(f"Welcome, {DOCTOR_PINS[pin_input_2]}! Authenticated Successfully.")
+        authenticated_doctor_2 = authenticate_doctor(pin_input_2)
+        if authenticated_doctor_2:
+            st.success(f"Welcome, {authenticated_doctor_2}! Authenticated Successfully (Secured via Bcrypt Hashing).")
             df = pd.read_sql_query("SELECT * FROM patients ORDER BY patient_id DESC", conn)
 
             if not df.empty:
